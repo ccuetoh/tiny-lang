@@ -1,0 +1,15 @@
+﻿# IDE folders
+.idea
+
+# CMake build folders
+cmake-*
+
+# Conan files
+conan.lock
+conanbuildinfo.txt
+conaninfo.txt
+conanbuildinfo.cmake
+graph_info.json
+
+# Testing sandbox
+sandbox
