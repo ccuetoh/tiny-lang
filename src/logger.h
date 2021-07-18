@@ -22,7 +22,6 @@ namespace tiny {
      * messages, and to std-err for error messages.
      */
     class Logger {
-
     public:
         /*!
          * Fetches the Logger's singleton instance. Logger implements Meyers' singleton pattern.

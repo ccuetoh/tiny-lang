@@ -44,8 +44,6 @@ tiny::Lexeme tiny::Lexer::lex() {
 
     switch (match) {
         case Token::SinglelineComment: {
-
-
             UnicodeCodepoints comment;
             for (uint32_t peek = s.peek(); peek != '\n' && s; peek = s.peek()) {
                 comment.push_back(s.get());

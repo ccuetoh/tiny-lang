@@ -41,7 +41,6 @@ namespace tiny {
 
         //! The maximum allowed search depth. Defaults to 1.
         int searchDepth = 1;
-
     };
 }
 
