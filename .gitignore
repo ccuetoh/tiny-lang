@@ -13,3 +13,6 @@ graph_info.json
 
 # Testing sandbox
 sandbox
+
+# Build directory
+build

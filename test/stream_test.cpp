@@ -30,9 +30,6 @@ TEST(WalkableStream, StreamOperations) {
     ws.backup();
     ws.backup();
     ASSERT_EQ(ws.peek(), 3);
-
-    ws.seek(-99999);
-    ASSERT_EQ(ws.get(), 1);
 }
 
 TEST(WalkableStream, StreamLargeVector) {

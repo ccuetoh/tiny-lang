@@ -17,7 +17,7 @@ namespace tiny {
         explicit Explorer() : baseDirectory(std::filesystem::current_path().string()) {};
 
         //! Creates an Explorer instance with the base directory set to the given path.
-        explicit Explorer(std::string baseDirectory) : baseDirectory(std::move(baseDirectory)) {};
+        explicit Explorer(std::string_view baseDirectory) : baseDirectory(baseDirectory) {};
 
         /*!
          * Iterates over the set directory and searches for a matching filename. The term might be a full filename

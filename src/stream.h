@@ -76,7 +76,7 @@ namespace tiny {
 
         //! Set the index to i
         void seek(unsigned long i) {
-            index = std::max(0ul, i);
+            index = i;
         }
 
         //! Get the i-th element on the stream. If the index is over the length of the collection,
