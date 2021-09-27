@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 add_subdirectory(test)
 
-include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+include(conanbuildinfo.cmake)
 conan_basic_setup()
 
 file(GLOB SOURCES "src/*.cpp")
