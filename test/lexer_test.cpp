@@ -381,6 +381,8 @@ TEST(Lexer, MultilineComment) {
 }
 
 TEST(Lexer, Unicode) {
+    std::locale::global(std::locale("en_US.UTF8"));
+
     std::stringstream data;
     data << "func máïn(){\n//úñícÖdé\n}";
 
@@ -622,6 +624,7 @@ TEST(Lexer, TestProgram3) {
 }
 
 TEST(Lexer, Benchmark) {
+    std::locale::global(std::locale("en_US.UTF8"));
     const std::int32_t benchmarkSize = 10000;
 
     // Generate the lexemes now, so they don't slow down the lexer when benchmarking

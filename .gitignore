@@ -1,8 +1,10 @@
 ﻿# IDE folders
 .idea
 
-# CMake build folders
+# CMake
 cmake-*
+/CMakeFiles/
+/CMakeCache.txt
 
 # Conan files
 conan.lock
@@ -19,10 +21,14 @@ build
 
 # ownCloud sync files
 .owncloudsync.log
-.sync_journal.db
-.sync_journal.db-shm
-.sync_journal.db-wal
+.sync_journal.*
 
 # Doxygen files
 Doxyfile
 doxygen
+
+# Google test build folders
+googletest-*
+/_deps/
+
+
