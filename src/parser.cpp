@@ -1102,7 +1102,7 @@ tiny::ASTNode tiny::Parser::literalNum() {
 
     // Default to an int64
     auto node = tiny::ASTNode(tiny::ASTNodeType::LiteralInt);
-    node.val = std::stoll(lexeme.value, nullptr, 0);
+    node.val = std::int64_t(std::stoll(lexeme.value, nullptr, 0));
 
     return node;
 }
