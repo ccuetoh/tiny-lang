@@ -1,18 +1,18 @@
 #include "explorer.h"
 
-int tiny::Explorer::getSearchDepth() const {
+std::int32_t tiny::Explorer::getSearchDepth() const {
     return searchDepth;
 }
 
-void tiny::Explorer::setSearchDepth(int depth) {
-    Explorer::searchDepth = depth;
+void tiny::Explorer::setSearchDepth(std::int32_t depth) {
+    searchDepth = depth;
 }
 
-std::vector<std::filesystem::directory_entry> tiny::Explorer::search(const std::string &term) {
+std::vector<std::filesystem::directory_entry> tiny::Explorer::search(const std::string &term) const {
     return searchMany(std::vector<std::string>{term});
 }
 
-std::vector<std::filesystem::directory_entry> tiny::Explorer::searchMany(const std::vector<std::string> &terms) {
+std::vector<std::filesystem::directory_entry> tiny::Explorer::searchMany(const std::vector<std::string> &terms) const {
     // Prepare filetype wildcards (ex. *.txt -> txt)
     std::vector<std::string> extensions;
     for (const auto &term : terms) {

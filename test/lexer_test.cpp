@@ -19,12 +19,11 @@
 std::random_device rd;
 std::mt19937 randomGen(rd());
 
-tiny::UnicodeCodepoints idRandChars = tiny::UnicodeParser::FromString(
+tiny::UnicodeCodepoints idRandChars = tiny::UnicodeParser::fromString(
         "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzáÁäÄçÇúÚüÜéÉëËóÓöÖíÍïÏ_");
 std::map<std::string, tiny::Lexeme> tokenRand{
         {"func",          tiny::Lexeme(tiny::Token::KwFunc)},
         {"as",            tiny::Lexeme(tiny::Token::KwAs)},
-        {"is",            tiny::Lexeme(tiny::Token::KwIs)},
         {"for",           tiny::Lexeme(tiny::Token::KwFor)},
         {"{",             tiny::Lexeme(tiny::Token::OBraces)},
         {"}",             tiny::Lexeme(tiny::Token::CBraces)},
@@ -52,28 +51,32 @@ tiny::Lexeme randomID() {
     do {
         std::shuffle(idRandChars.begin(), idRandChars.end(), randomGen);
 
-        std::uniform_int_distribution<int> uni(1, int(idRandChars.size() - 1));
-        int size = uni(randomGen);
+        std::uniform_int_distribution<std::int32_t> uni(1, std::int32_t(idRandChars.size() - 1));
+        std::int32_t size = uni(randomGen);
 
-        id = tiny::UnicodeParser::ToString(tiny::UnicodeCodepoints(idRandChars.begin(), idRandChars.begin() + size));
+        id = tiny::UnicodeParser::toString(tiny::UnicodeCodepoints(idRandChars.begin(), idRandChars.begin() + size));
     } while (isdigit(id[0]));
 
     return tiny::Lexeme(tiny::Token::Id, id);
 }
 
 std::pair<std::string, tiny::Lexeme> randomLexeme() {
-    std::uniform_int_distribution<int> zeroToOne(0, 1);
+    std::uniform_int_distribution<std::int32_t> zeroToOne(0, 1);
     if (zeroToOne(randomGen) < .333) { // 1/3 chance
         auto id = randomID();
         return {id.value, id};
     }
 
-    std::uniform_int_distribution<int> randomTokenRand(1, tokenRand.size() - 1);
+    std::uniform_int_distribution<std::int32_t> randomTokenRand(1, tokenRand.size() - 1);
 
     auto item = tokenRand.begin();
     std::advance(item, randomTokenRand(randomGen));
 
     return {item->first, item->second};
+}
+
+TEST(Lexer, LocaleSetup) {
+    std::locale::global(std::locale("en_US.UTF8"));
 }
 
 
@@ -95,46 +98,47 @@ TEST(Lexer, EmptyStream) {
 
 TEST(Lexer, Keywords) {
     std::stringstream data;
-    data << "const import module struct func as is for in return and or";
+    data << "const import module struct func as for in return and or if else";
 
     tiny::Lexer lexer(data);
 
-    auto lexemes = lexer.lexAll();
-    std::vector<tiny::Lexeme> expect{
-            tiny::Lexeme(tiny::Token::KwConst),
-            tiny::Lexeme(tiny::Token::KwImport),
-            tiny::Lexeme(tiny::Token::KwModule),
-            tiny::Lexeme(tiny::Token::KwStruct),
-            tiny::Lexeme(tiny::Token::KwFunc),
-            tiny::Lexeme(tiny::Token::KwAs),
-            tiny::Lexeme(tiny::Token::KwIs),
-            tiny::Lexeme(tiny::Token::KwFor),
-            tiny::Lexeme(tiny::Token::KwIn),
-            tiny::Lexeme(tiny::Token::KwReturn),
-            tiny::Lexeme(tiny::Token::KwAnd),
-            tiny::Lexeme(tiny::Token::KwOr),
-    };
+    try {
+        auto lexemes = lexer.lexAll();
+        std::vector<tiny::Lexeme> expect{
+                tiny::Lexeme(tiny::Token::KwConst),
+                tiny::Lexeme(tiny::Token::KwImport),
+                tiny::Lexeme(tiny::Token::KwModule),
+                tiny::Lexeme(tiny::Token::KwStruct),
+                tiny::Lexeme(tiny::Token::KwFunc),
+                tiny::Lexeme(tiny::Token::KwAs),
+                tiny::Lexeme(tiny::Token::KwFor),
+                tiny::Lexeme(tiny::Token::KwIn),
+                tiny::Lexeme(tiny::Token::KwReturn),
+                tiny::Lexeme(tiny::Token::KwAnd),
+                tiny::Lexeme(tiny::Token::KwOr),
+                tiny::Lexeme(tiny::Token::KwIf),
+                tiny::Lexeme(tiny::Token::KwElse),
+        };
 
-    ASSERT_EQ(lexemes, expect);
+        ASSERT_EQ(lexemes, expect);
+    } catch (tiny::LexError &e) {
+        std::cout << e.what() << std::endl;
+        FAIL();
+    }
 }
 
 TEST(Lexer, Ints) {
     std::stringstream data;
-    data << "int uint uint8 int16 uint16 int32 uint32 int64 uint64";
+    data << "int int16 int32 int64";
 
     tiny::Lexer lexer(data);
 
     auto lexemes = lexer.lexAll();
     std::vector<tiny::Lexeme> expect{
             tiny::Lexeme(tiny::Token::TypeInt32),
-            tiny::Lexeme(tiny::Token::TypeUInt32),
-            tiny::Lexeme(tiny::Token::TypeUInt8),
             tiny::Lexeme(tiny::Token::TypeInt16),
-            tiny::Lexeme(tiny::Token::TypeUInt16),
             tiny::Lexeme(tiny::Token::TypeInt32),
-            tiny::Lexeme(tiny::Token::TypeUInt32),
             tiny::Lexeme(tiny::Token::TypeInt64),
-            tiny::Lexeme(tiny::Token::TypeUInt64),
     };
 
     ASSERT_EQ(lexemes, expect);
@@ -142,21 +146,16 @@ TEST(Lexer, Ints) {
 
 TEST(Lexer, Fixed) {
     std::stringstream data;
-    data << "fixed ufixed ufixed8 fixed16 ufixed16 fixed32 ufixed32 fixed64 ufixed64";
+    data << "fixed fixed16 fixed32 fixed64";
 
     tiny::Lexer lexer(data);
 
     auto lexemes = lexer.lexAll();
     std::vector<tiny::Lexeme> expect{
             tiny::Lexeme(tiny::Token::TypeFixed32),
-            tiny::Lexeme(tiny::Token::TypeUFixed32),
-            tiny::Lexeme(tiny::Token::TypeUFixed8),
             tiny::Lexeme(tiny::Token::TypeFixed16),
-            tiny::Lexeme(tiny::Token::TypeUFixed16),
             tiny::Lexeme(tiny::Token::TypeFixed32),
-            tiny::Lexeme(tiny::Token::TypeUFixed32),
             tiny::Lexeme(tiny::Token::TypeFixed64),
-            tiny::Lexeme(tiny::Token::TypeUFixed64),
     };
 
     ASSERT_EQ(lexemes, expect);
@@ -164,21 +163,16 @@ TEST(Lexer, Fixed) {
 
 TEST(Lexer, Float) {
     std::stringstream data;
-    data << "float ufloat ufloat8 float16 ufloat16 float32 ufloat32 float64 ufloat64";
+    data << "float float16 float32 float64";
 
     tiny::Lexer lexer(data);
 
     auto lexemes = lexer.lexAll();
     std::vector<tiny::Lexeme> expect{
             tiny::Lexeme(tiny::Token::TypeFloat32),
-            tiny::Lexeme(tiny::Token::TypeUFloat32),
-            tiny::Lexeme(tiny::Token::TypeUFloat8),
             tiny::Lexeme(tiny::Token::TypeFloat16),
-            tiny::Lexeme(tiny::Token::TypeUFloat16),
             tiny::Lexeme(tiny::Token::TypeFloat32),
-            tiny::Lexeme(tiny::Token::TypeUFloat32),
             tiny::Lexeme(tiny::Token::TypeFloat64),
-            tiny::Lexeme(tiny::Token::TypeUFloat64),
     };
 
     ASSERT_EQ(lexemes, expect);
@@ -277,7 +271,7 @@ TEST(Lexer, Comparators) {
 
 TEST(Lexer, Symbols) {
     std::stringstream data;
-    data << ", \n  := ! !! :";
+    data << ", \n  := ! !!";
 
     tiny::Lexer lexer(data);
 
@@ -288,7 +282,6 @@ TEST(Lexer, Symbols) {
             tiny::Lexeme(tiny::Token::Init),
             tiny::Lexeme(tiny::Token::Negation),
             tiny::Lexeme(tiny::Token::Doublebang),
-            tiny::Lexeme(tiny::Token::Colon),
     };
 
     ASSERT_EQ(lexemes, expect);
@@ -629,13 +622,13 @@ TEST(Lexer, TestProgram3) {
 }
 
 TEST(Lexer, Benchmark) {
-    const int benchmarkSize = 10000;
+    const std::int32_t benchmarkSize = 10000;
 
-    // Generate the lexemes now so they don't slow down the lexer when benchmarking
+    // Generate the lexemes now, so they don't slow down the lexer when benchmarking
     std::stringstream program;
     std::vector<tiny::Lexeme> expect;
 
-    for (int n = 0; n < benchmarkSize; n++) {
+    for (std::int32_t n = 0; n < benchmarkSize; n++) {
         auto lexemePair = randomLexeme();
 
         program << " " + lexemePair.first;
@@ -657,7 +650,7 @@ TEST(Lexer, Benchmark) {
     auto end = std::chrono::high_resolution_clock::now();
 
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-    auto tokensPerSecond = int((float(benchmarkSize) / float(duration.count())) * 1000);
+    auto tokensPerSecond = std::int32_t((float(benchmarkSize) / float(duration.count())) * 1000);
 
     std::cout << "Lexer benchmark -> Lexed " << benchmarkSize << " random tokens in " << duration.count() << "ms ("
               << tokensPerSecond << " tokens/second)\n";

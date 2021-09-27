@@ -16,3 +16,13 @@ sandbox
 
 # Build directory
 build
+
+# ownCloud sync files
+.owncloudsync.log
+.sync_journal.db
+.sync_journal.db-shm
+.sync_journal.db-wal
+
+# Doxygen files
+Doxyfile
+doxygen

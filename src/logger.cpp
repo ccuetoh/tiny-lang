@@ -4,11 +4,11 @@ void tiny::Logger::setLevel(tiny::Logger::Level lv) {
     level = lv;
 }
 
-int tiny::Logger::getLevel() const {
+tiny::Logger::Level tiny::Logger::getLevel() const {
     return level;
 }
 
-void tiny::Logger::log(tiny::Logger::Level lv, const std::string &msg) {
+void tiny::Logger::log(const std::string &msg, Logger::Level lv) {
     LogMsg logMsg(lv, msg);
     log(logMsg);
 }
@@ -44,23 +44,23 @@ void tiny::Logger::log(const tiny::LogMsg &msg) {
 }
 
 void tiny::Logger::debug(const std::string &msg) {
-    log(Level::Debug, msg);
+    log(msg, Level::Debug);
 }
 
 void tiny::Logger::info(const std::string &msg) {
-    log(Level::Info, msg);
+    log(msg, Level::Info);
 }
 
 void tiny::Logger::warning(const std::string &msg) {
-    log(Level::Warning, msg);
+    log(msg, Level::Warning);
 }
 
 void tiny::Logger::error(const std::string &msg) {
-    log(Level::Error, msg);
+    log(msg, Level::Error);
 }
 
 void tiny::Logger::fatal(const std::string &msg) {
-    log(Level::Fatal, msg);
+    log(msg, Level::Fatal);
 }
 
 std::string tiny::LogMsg::levelToString(Logger::Level lv) {
@@ -80,32 +80,30 @@ std::string tiny::LogMsg::levelToString(Logger::Level lv) {
     }
 }
 
-int tiny::LogMsg::levelColour(tiny::Logger::Level lv) {
+std::int32_t tiny::LogMsg::levelColour(tiny::Logger::Level lv) {
+    switch (lv) {
 #if defined(_WIN32)
-    switch (lv) {
-        case Logger::Debug:
+        case Logger::Level::Debug:
             return 15;
-        case Logger::Info:
+        case Logger::Level::Info:
             return 9;
-        case Logger::Warning:
+        case Logger::Level::Warning:
             return 14;
-        case Logger::Error:
-        case Logger::Fatal:
+        case Logger::Level::Error:
+        case Logger::Level::Fatal:
             return 12;
-    }
 #else
-    switch (lv) {
-        case Logger::Debug:
+        case Logger::Level::Debug:
             return 37;
-        case Logger::Info:
+        case Logger::Level::Info:
             return 34;
-        case Logger::Warning:
+        case Logger::Level::Warning:
             return 33;
-        case Logger::Error:
-        case Logger::Fatal:
+        case Logger::Level::Error:
+        case Logger::Level::Fatal:
             return 31;
-    }
 #endif
-
-    return 0;
+        default:
+            return 0;
+    }
 }

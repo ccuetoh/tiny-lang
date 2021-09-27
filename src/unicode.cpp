@@ -1,12 +1,12 @@
 #include "unicode.h"
 
-tiny::UnicodeCodepoints tiny::UnicodeParser::FromStream(std::istream &stream) {
+tiny::UnicodeCodepoints tiny::UnicodeParser::fromStream(std::istream &stream) {
     std::istreambuf_iterator<char> it(stream.rdbuf());
     std::istreambuf_iterator<char> eos;
 
-    std::vector<uint32_t> codepoints;
+    std::vector<std::uint32_t> codepoints;
 
-    uint32_t val;
+    std::uint32_t val;
     try {
         for (val = utf8::next(it, eos); val; val = utf8::next(it, eos)) {
             codepoints.push_back(val);
@@ -17,7 +17,7 @@ tiny::UnicodeCodepoints tiny::UnicodeParser::FromStream(std::istream &stream) {
     return codepoints;
 }
 
-std::string tiny::UnicodeParser::ToString(uint32_t codepoint) {
+std::string tiny::UnicodeParser::toString(std::uint32_t codepoint) {
     std::string out;
     if (codepoint <= 0x7f)
         out.append(1, static_cast<char>(codepoint));
@@ -38,20 +38,20 @@ std::string tiny::UnicodeParser::ToString(uint32_t codepoint) {
     return out;
 }
 
-std::string tiny::UnicodeParser::ToString(const UnicodeCodepoints &codepoints) {
+std::string tiny::UnicodeParser::toString(const UnicodeCodepoints &codepoints) {
     std::string out;
     for (auto const &codepoint: codepoints) {
-        out += tiny::UnicodeParser::ToString(codepoint);
+        out += tiny::UnicodeParser::toString(codepoint);
     }
 
     return out;
 }
 
-tiny::UnicodeCodepoints tiny::UnicodeParser::FromString(std::string_view str) {
-    std::vector<uint32_t> codepoints;
+tiny::UnicodeCodepoints tiny::UnicodeParser::fromString(std::string_view str) {
+    std::vector<std::uint32_t> codepoints;
     auto it = str.begin();
 
-    uint32_t val;
+    std::uint32_t val;
     try {
         for (val = utf8::next(it, str.end()); val; val = utf8::next(it, str.end())) {
             codepoints.push_back(val);

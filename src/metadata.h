@@ -5,27 +5,55 @@
 #include "unicode.h"
 
 namespace tiny {
-//! The Metadata struct contains information regarding the character's stream information, and it's used for debugging and
-//! error logging.
+    //! The Metadata struct contains information regarding the character's stream information
     struct Metadata {
         //! Empty constructor for the metadata
         Metadata() = default;
 
-        //! Full constructor for the metadata
-        explicit Metadata(std::string_view fn, int p) : filename(fn), pos(p) {};
+        /*!
+         * \brief Constructor with the start and end positions
+         * \param fn The file's path
+         * \param startPos The index at which the metadata points
+         * \param endPos The index at which the metadata stops
+         */
+        explicit Metadata(std::string_view fn, std::uint64_t startPos, std::uint64_t endPos) : filename(fn),
+                                                                                               start(startPos),
+                                                                                               end(endPos) {};
 
         //! Filename from which the character proceeds from
         std::string filename;
 
-        //! Index of the stream's current position
-        int pos = 0;
+        //! Index of the token start
+        std::uint64_t start = 0;
 
-        //! Returns the position of the metadata index as a line-column pair
-        [[nodiscard]] std::pair<int, int> getPosition(tiny::WalkableStream<uint32_t> &s) const;
+        //! Index of the token end
+        std::uint64_t end = 0;
 
-        //! Returns a pair containing the strings around the error, cutoff by newlines and maxed at range and
-        //! the position on which the error was generated inside the context.
-        [[nodiscard]] std::pair<std::string, int> getContext(tiny::WalkableStream<uint32_t> &s, int range = 100) const;
+        /*!
+         * \brief Returns the position of the metadata inside the provided stream [line, column] pair
+         * \param s Stream in which the position is calculated
+         * \return A [line, column] index pair
+         */
+        [[nodiscard]] std::pair<std::uint64_t, std::uint64_t> getPosition(tiny::WalkableStream<std::uint32_t> &s) const;
+
+        /*!
+         * \brief Returns the context around the error and the position of the error in the context
+         * \param s Stream in which the error was generated
+         * \param range Optional maximum length of the context. Defaults to 100
+         * \return A [context, error position] pair
+         *
+         * Returns a pair containing the strings around the error, cutoff by newlines and maxed by the provided range,
+         * and the position on which the error was generated inside the context. The context is generated around the
+         * error position. So a maximum of 2/range - len(error) characters will be to either side of the error string.
+         */
+        [[nodiscard]] std::pair<std::string, std::int32_t>
+        getContext(tiny::WalkableStream<std::uint32_t> &s, std::int32_t range = 100) const;
+
+        /*!
+         * \brief Returns the length between the start and end positions
+         * \return The difference between the end and start positions. If the end is not set then 1 is returned.
+         */
+        [[nodiscard]] std::int32_t getLength() const;
     };
 }
 

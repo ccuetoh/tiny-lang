@@ -7,7 +7,7 @@
 #include "stream.h"
 
 TEST(WalkableStream, StreamOperations) {
-    std::vector<int> vec = {1, 2, 3, 4, 5};
+    std::vector<std::int32_t> vec = {1, 2, 3, 4, 5};
     auto ws = tiny::WalkableStream(vec);
 
     ASSERT_EQ(ws.get(), 1);

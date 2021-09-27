@@ -15,20 +15,36 @@ namespace tiny {
     //! A WalkableStream wraps a vector so it can be accessed sequentially and similar to a stream
     class WalkableStream {
     public:
-        //! Use a collection for the creation of the stream and provide a terminator value
+        /*!
+         * \brief Use a collection for the creation of the stream and provide a terminator value
+         * \param col A vector of items to add to the stream
+         * \param terminator An optional terminator to return if the stream's length is exceeded
+         */
         explicit WalkableStream(std::vector<T> col, T terminator = T{}) : collection(col), terminator(terminator) {};
 
-        //! Use a std::stream for the creation of the underlying vector.
+        /*!
+         * \brief Use a std::stream for the creation of the underlying vector
+         * \param stream A stream of UTF-8 encoded characters to add to the WalkableStream
+         * \param terminator An optional terminator to return if the stream's length is exceeded
+         */
         explicit WalkableStream(std::istream &stream, T terminator = T{}) : terminator(terminator), collection(
-                tiny::UnicodeParser::FromStream(stream)) {};
+                tiny::UnicodeParser::fromStream(stream)) {};
 
-        //! Check whether the end of the stream has been reached
+        /*!
+         * \brief Check whether the end of the stream has been reached
+         * \return True if there's still items in the stream, false otherwise
+         */
         explicit operator bool() const {
             return index < collection.size();
         }
 
-        //! Fetches the next item in the stream. If the index is over the length of the collection, a terminator value will
-        //! be returned
+        /*!
+         * \brief Fetches the next item in the stream and advances it
+         * \return The next item if the stream is valid, the terminator otherwise
+         *
+         * Fetches the next item in the stream and advances its position by one. If the index is over the length of the
+         * collection, a terminator value will be returned
+         */
         [[nodiscard]] T get() {
             if (index >= collection.size()) {
                 return terminator;
@@ -37,8 +53,13 @@ namespace tiny {
             return collection[index++];
         }
 
-        //! Fetches the next item without stepping over it, and keeps the index position the same. If the index is over
-        //! the length of the collection, a terminator value will be returned
+        /*!
+         * \brief Fetches the next item in the stream without advancing its position
+         * \return The next item if the stream is valid, the terminator otherwise
+         *
+         * Fetches the next item without stepping over it, and keeps the index position the same. If the index is over
+         * the length of the collection, a terminator value will be returned
+         */
         [[nodiscard]] T peek() {
             if (index >= collection.size()) {
                 return terminator;
@@ -47,67 +68,127 @@ namespace tiny {
             return collection[index];
         }
 
-        //! Go back one position
+        //! Goes back one position
         void backup() {
             rewind(1);
         }
 
-        //! Go forwards one position
+        //! Goes forwards one position
         void skip() {
             advance(1);
         }
 
-        //! Go i positions forward
-        int advance(int i) {
+        /*!
+         * \brief Goes a number of positions forward
+         * \param i The number of positions to advance
+         */
+        std::int32_t advance(std::int32_t i) {
             index += i;
             return index;
         }
 
-        //! Go i positions backwards
-        int rewind(unsigned long i) {
+        /*!
+         * \brief Goes a number of positions backwards
+         * \param i The number of positions to go back
+         */
+        std::int32_t rewind(unsigned long i) {
             // Make sure that if the index is over the collection size the rewind starts at the last item.
-            if (index > collection.size()) {
+            if (index > collection.size() && index != 0) {
                 index = collection.size() - 1;
             }
 
-            index = std::max(0ul, index - i);
+            if (index <= i) {
+                index = 0; // Prevent overflows
+                return index;
+            }
+
+            index--;
             return index;
         }
 
-        //! Set the index to i
+        /*!
+         * \brief Set the stream's index
+         * \param i The index of the stream
+         */
         void seek(unsigned long i) {
             index = i;
         }
 
-        //! Get the i-th element on the stream. If the index is over the length of the collection,
-        //! a terminator value will be returned
+        /*!
+         * \brief Gets the i-th element on the stream
+         * \param i The index to get from
+         *
+         * Get the i-th element on the stream. If the index is over the length of the collection, a terminator value
+         * will be returned
+         */
         [[nodiscard]] T get(unsigned long i) {
-            if (index >= collection.size()) {
+            if (i >= collection.size()) {
                 return terminator;
             }
 
             return collection[i];
         }
 
-        //! Get a vector spanning [from:to[. The to parameter is bound-checked, and will return a vector up to the length
-        //! of the stream.
+        /*!
+         * \brief Gets the i-th element on the stream
+         * \param from The inclusive start of the vector
+         * \param to  The exclusive end of the vector
+         * \return A vector spanning [from:to[
+         *
+         * Gets a vector spanning [from:to[. The to parameter is bound-checked, and will return a vector up to the
+         * length of the stream.
+         */
         [[nodiscard]] std::vector<T> getVector(unsigned long from, unsigned long to) {
             return std::vector<T>(collection.begin() + from, collection.begin() + (std::min)(to, (unsigned long)(collection.size())));
         }
 
-        //! Gets the current position
-        [[nodiscard]] unsigned long getIndex() {
+        /*!
+         * \brief Get a vector as a copy of the internal collection of the stream
+         * \return A vector copy of the stream
+         */
+        [[nodiscard]] std::vector<T> getVector() {
+            return std::vector<T>(collection.begin(), collection.begin() + collection.size());
+        }
+
+        /*!
+         * \brief Gets the current position of the stream
+         * \return The stream's index
+         */
+        [[nodiscard]] unsigned long getIndex() const {
             return index;
         }
 
-        //! Gets the terminator value
-        [[nodiscard]] T getTerminator() {
+        /*!
+         * \brief Gets the terminator value
+         * \return The stream's terminator value
+         */
+        [[nodiscard]] T getTerminator() const {
             return terminator;
         }
 
-        //! Sets the terminator to a new value
-        void setTerminator(T t) {
-            return t;
+        /*!
+         * \brief Replaces the terminator value
+         * \param t The new terminator value
+         */
+        void setTerminator(T t) const {
+            terminator = t;
+        }
+
+        /*!
+         * \brief Returns whether the provided value is the terminator
+         * \param t A value to compare
+         * \return True if it's the terminator, false otherwise
+         */
+        bool isTerminator(T t) {
+            return terminator == t;
+        }
+
+        /*!
+         * \brief Returns the length of the stream
+         * \return The length of the stream
+         */
+        std::size_t length() {
+            return collection.size();
         }
 
     private:

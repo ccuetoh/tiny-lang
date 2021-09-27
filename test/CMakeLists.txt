@@ -24,7 +24,7 @@ list(FILTER SOURCES EXCLUDE REGEX ".*main.cpp$")
 include(GoogleTest)
 gtest_add_tests(TARGET tests SOURCES ${TESTS})
 
-include(../conanbuildinfo.cmake)
+include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup()
 
 add_executable(tests ${SOURCES} ${TESTS})
