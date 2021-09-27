@@ -33,11 +33,11 @@ jobs:
         run: conan install conanfile.txt --profile default
 
       - name: Configure CMake
-        run: cmake ${{github.workspace}}/test -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=RELEASE
+        run: cmake ${{github.workspace}}/test -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
 
       - name: Build
-        run: cmake --build ${{github.workspace}}/build --config RELEASE
+        run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
 
       - name: Run
         working-directory: ${{github.workspace}}/build
-        run: ctest -C RELEASE
+        run: ctest -C ${{env.BUILD_TYPE}}
