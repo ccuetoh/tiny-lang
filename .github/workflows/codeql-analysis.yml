@@ -49,7 +49,7 @@ jobs:
       run: conan install conanfile.txt --profile default
 
     - name: Configure CMake
-      run: cmake ${{github.workspace}}/test -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+      run: cmake ${{github.workspace}} -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
 
     - name: Build
       run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
