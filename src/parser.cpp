@@ -332,13 +332,13 @@ tiny::ASTNode tiny::Parser::forEachExpression() {
 /*
  *  FuncDeclStatement ::= func ('(' <TypedExpression> ')') <Identifier> <FunctionArgumentDeclList> <ReturnDeclStatement> \n* <BlockStatement>
  */
-tiny::ASTNode tiny::Parser::funcDeclStatement(bool hasBody) {
+tiny::ASTNode tiny::Parser::funcDeclStatement(bool isPrototype) {
     consume(tiny::Token::KwFunc);
 
     tiny::ASTNode node(tiny::ASTNodeType::FunctionDeclaration);
 
     // Method?
-    if (consumeOptional(tiny::Token::OParenthesis)) {
+    if (!isPrototype && consumeOptional(tiny::Token::OParenthesis)) {
         node.type = tiny::ASTNodeType::MethodDeclaration;
 
         auto typeExp = typedExpression();
@@ -352,12 +352,12 @@ tiny::ASTNode tiny::Parser::funcDeclStatement(bool hasBody) {
     auto id = consume(tiny::Token::Id);
     node.addParam(tiny::Parameter(tiny::ParameterType::Name, tiny::stringToValue(id.value)));
 
-    node.addChildren(argumentDeclList());
+    node.addChildren(argumentDeclList(!isPrototype));
     node.addChildren(returnDeclList());
 
     exhaust(tiny::Token::NewLine);
 
-    if (hasBody) {
+    if (!isPrototype) {
         node.addChildren(tiny::ASTNode(ASTNodeType::FunctionBody, blockStatement()));
     }
 
@@ -367,7 +367,7 @@ tiny::ASTNode tiny::Parser::funcDeclStatement(bool hasBody) {
 /*
  *  FunctionArgumentDeclList ::= ([<AddressableType> (ConstraintList)[, <AddressableType> (ConstraintList)]*|e])
  */
-tiny::ASTNode tiny::Parser::argumentDeclList() {
+tiny::ASTNode tiny::Parser::argumentDeclList(bool hasNamedArgs) {
     tiny::ASTNode node(tiny::ASTNodeType::FunctionArgumentDeclList);
 
     consume(tiny::Token::OParenthesis);
@@ -377,7 +377,10 @@ tiny::ASTNode tiny::Parser::argumentDeclList() {
 
         auto arg = addressableType();
         arg.type = tiny::ASTNodeType::FunctionArgumentDecl;
-        arg.addParam(tiny::Parameter(tiny::ParameterType::Name, identifier().val));
+
+        if (hasNamedArgs) {
+            arg.addParam(tiny::Parameter(tiny::ParameterType::Name, identifier().val));
+        }
 
         // Argument constrains
         if (check(tiny::Token::OBrackets)) {
@@ -547,7 +550,11 @@ tiny::ASTNode tiny::Parser::structFieldList() {
                 id.type = tiny::ASTNodeType::Composition;
                 node.addChildren(id);
 
-                consume(tiny::Token::Comma);
+                if (!consumeOptional(tiny::Token::Comma)) {
+                    exhaust(tiny::Token::NewLine);
+                    break;
+                }
+
                 exhaust(tiny::Token::NewLine);
 
                 continue;
@@ -567,7 +574,11 @@ tiny::ASTNode tiny::Parser::structFieldList() {
 
         node.addChildren(field);
 
-        consume(tiny::Token::Comma);
+        if (!consumeOptional(tiny::Token::Comma)) {
+            exhaust(tiny::Token::NewLine);
+            break;
+        }
+
         exhaust(tiny::Token::NewLine);
     }
 
@@ -588,9 +599,13 @@ tiny::ASTNode tiny::Parser::traitFieldList() {
     while (!check(tiny::Token::CBraces)) {
         // Function?
         if (check(tiny::Token::KwFunc)) {
-            node.addChildren(funcDeclStatement(false));
+            node.addChildren(funcDeclStatement(true));
 
-            consume(tiny::Token::Comma);
+            if (!consumeOptional(tiny::Token::Comma)) {
+                exhaust(tiny::Token::NewLine);
+                break;
+            }
+
             exhaust(tiny::Token::NewLine);
 
             continue;

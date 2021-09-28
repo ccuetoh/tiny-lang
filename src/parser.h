@@ -136,15 +136,17 @@ namespace tiny {
 
         /*!
          * \brief Consumes an function or method declaration from the stream
+         * \param isPrototype Whether the parser should treat the function as a prototype function. Defaults to false
          * \return An ASTNode of type FunctionDeclaration or MethodDeclaration
          */
-        [[nodiscard]] tiny::ASTNode funcDeclStatement(bool hasBody=true);
+        [[nodiscard]] tiny::ASTNode funcDeclStatement(bool isPrototype=false);
 
         /*!
          * \brief Consumes a list of arguments as given inside a function or method declaration
+         * \param isAnonymous Whether the parser should expect no name name for the arguments. Defaults to false
          * \return An ASTNode of type FunctionArgumentDeclList with children of type FunctionArgumentDecl
          */
-        [[nodiscard]] tiny::ASTNode argumentDeclList();
+        [[nodiscard]] tiny::ASTNode argumentDeclList(bool hasNamedArgs=false);
 
         /*!
          * \brief Consumes list of returns as given inside a function or method declaration
