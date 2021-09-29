@@ -98,7 +98,7 @@ TEST(Lexer, EmptyStream) {
 
 TEST(Lexer, Keywords) {
     std::stringstream data;
-    data << "const import module struct func as for in return and or if else";
+    data << "const import module struct func as for in return and or if else trait struct";
 
     tiny::Lexer lexer(data);
 
@@ -118,6 +118,8 @@ TEST(Lexer, Keywords) {
                 tiny::Lexeme(tiny::Token::KwOr),
                 tiny::Lexeme(tiny::Token::KwIf),
                 tiny::Lexeme(tiny::Token::KwElse),
+                tiny::Lexeme(tiny::Token::KwTrait),
+                tiny::Lexeme(tiny::Token::KwStruct),
         };
 
         ASSERT_EQ(lexemes, expect);
@@ -408,6 +410,75 @@ TEST(Lexer, Unicode) {
         std::cout << e.what() << std::endl;
         FAIL();
     }
+}
+
+
+TEST(Lexer, StructDeclaration) {
+    std::stringstream data;
+    data << "struct test {\n"
+            "    testCompose\n"
+            "    string testVariable\n"
+            "}\n";
+
+    tiny::Lexer lexer(data);
+
+    auto lexemes = lexer.lexAll();
+    std::vector<tiny::Lexeme> expect{
+            tiny::Lexeme(tiny::Token::KwStruct),
+            tiny::Lexeme(tiny::Token::Id, "test"),
+            tiny::Lexeme(tiny::Token::OBraces),
+            tiny::Lexeme(tiny::Token::NewLine),
+            tiny::Lexeme(tiny::Token::Id, "testCompose"),
+            tiny::Lexeme(tiny::Token::NewLine),
+            tiny::Lexeme(tiny::Token::TypeString),
+            tiny::Lexeme(tiny::Token::Id, "testVariable"),
+            tiny::Lexeme(tiny::Token::NewLine),
+            tiny::Lexeme(tiny::Token::CBraces),
+            tiny::Lexeme(tiny::Token::NewLine)
+    };
+
+    ASSERT_EQ(lexemes, expect);
+}
+
+TEST(Lexer, TraitDeclaration) {
+    std::stringstream data;
+    data << "trait test1 [test2, test3] {\n"
+            "    string testVariable,\n"
+            "    func testFunc(int, string, customType)\n"
+            "}\n";
+
+    tiny::Lexer lexer(data);
+
+    auto lexemes = lexer.lexAll();
+    std::vector<tiny::Lexeme> expect{
+            tiny::Lexeme(tiny::Token::KwTrait),
+            tiny::Lexeme(tiny::Token::Id, "test1"),
+            tiny::Lexeme(tiny::Token::OBrackets),
+            tiny::Lexeme(tiny::Token::Id, "test2"),
+            tiny::Lexeme(tiny::Token::Comma),
+            tiny::Lexeme(tiny::Token::Id, "test3"),
+            tiny::Lexeme(tiny::Token::CBrackets),
+            tiny::Lexeme(tiny::Token::OBraces),
+            tiny::Lexeme(tiny::Token::NewLine),
+            tiny::Lexeme(tiny::Token::TypeString),
+            tiny::Lexeme(tiny::Token::Id, "testVariable"),
+            tiny::Lexeme(tiny::Token::Comma),
+            tiny::Lexeme(tiny::Token::NewLine),
+            tiny::Lexeme(tiny::Token::KwFunc),
+            tiny::Lexeme(tiny::Token::Id, "testFunc"),
+            tiny::Lexeme(tiny::Token::OParenthesis),
+            tiny::Lexeme(tiny::Token::TypeInt32),
+            tiny::Lexeme(tiny::Token::Comma),
+            tiny::Lexeme(tiny::Token::TypeString),
+            tiny::Lexeme(tiny::Token::Comma),
+            tiny::Lexeme(tiny::Token::Id, "customType"),
+            tiny::Lexeme(tiny::Token::CParenthesis),
+            tiny::Lexeme(tiny::Token::NewLine),
+            tiny::Lexeme(tiny::Token::CBraces),
+            tiny::Lexeme(tiny::Token::NewLine)
+    };
+
+    ASSERT_EQ(lexemes, expect);
 }
 
 TEST(Lexer, TestProgram1) {

@@ -27,10 +27,10 @@ namespace tiny {
         KwImport, // import
         KwModule, // module
         KwStruct, // struct
-        KwTrait, // trait TODO Add tests
+        KwTrait, // trait
         KwFunc, //func
-        KwAs, // as TODO Add tests
-        KwIn, // in TODO Add tests
+        KwAs, // as
+        KwIn, // in
         KwIf, //if
         KwElse, // else
         KwFor, // for
