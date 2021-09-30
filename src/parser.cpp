@@ -51,8 +51,8 @@ bool tiny::Parser::check(tiny::Token token) {
  *     -> Imports
  *     -> ModuleName
  */
-tiny::ASTFile tiny::Parser::file(std::string_view filename) {
-    auto mod = moduleStatement();
+tiny::ASTFile tiny::Parser::file(std::string_view filename, bool requireModule) {
+    auto mod = moduleStatement(!requireModule);
     auto imprts = importStatement();
 
     return tiny::ASTFile(
@@ -65,10 +65,14 @@ tiny::ASTFile tiny::Parser::file(std::string_view filename) {
 /*
  *  ModuleStatement ::= module STRING
  */
-std::string tiny::Parser::moduleStatement() {
+std::string tiny::Parser::moduleStatement(bool optional) {
     exhaust(SKIPABLE_TOKENS);
 
     if (!consumeOptional(tiny::Token::KwModule)) {
+        if (optional) {
+            return "";
+        }
+
         throw tiny::ParseError("No module name defined", getMetadata());
     }
 

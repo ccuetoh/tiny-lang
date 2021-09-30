@@ -24,9 +24,10 @@ namespace tiny {
         /*!
          * \brief Parses a complete file of source code
          * \param filename The path of the file for metadata
+         * \param requireModule Whether an exception is thrown if no module name is declared
          * \return An ASTFile containing the Abstract Syntax Tree and data about the program
          */
-        [[nodiscard]] tiny::ASTFile file(std::string_view filename = "");
+        [[nodiscard]] tiny::ASTFile file(std::string_view filename = "", bool requireModule=true);
 
     private:
         /*!
@@ -78,9 +79,10 @@ namespace tiny {
 
         /*!
          * \brief Expects a module name in the stream, consume the corresponding tokens and returns the module name
+         * \param optional Whether an error should be thrown when no module name is present
          * \return The name of the module
          */
-        [[nodiscard]] std::string moduleStatement();
+        [[nodiscard]] std::string moduleStatement(bool optional=false);
 
         /*!
          * \brief Consumes an import statement from the stream

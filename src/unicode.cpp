@@ -12,7 +12,9 @@ tiny::UnicodeCodepoints tiny::UnicodeParser::fromStream(std::istream &stream) {
             codepoints.push_back(val);
         }
     }
-    catch (utf8::not_enough_room &e) {}
+    catch (const utf8::not_enough_room &) {
+        // Sometimes this exception is thrown on EOF. Seems to be a bug on the library. Ignore for now.
+    }
 
     return codepoints;
 }
@@ -57,7 +59,9 @@ tiny::UnicodeCodepoints tiny::UnicodeParser::fromString(std::string_view str) {
             codepoints.push_back(val);
         }
     }
-    catch (utf8::not_enough_room &e) {}
+    catch (const utf8::not_enough_room &) {
+        // Sometimes this exception is thrown on EOF. Seems to be a bug on the library. Ignore for now.
+    }
 
     return codepoints;
 }
