@@ -39,7 +39,8 @@ namespace tiny {
          * \param terms A full filename or an extension wildcard
          * \return A vector with the results of the search. Empty vector if no matches where found.
          */
-        [[nodiscard]] std::vector<std::filesystem::directory_entry> searchMany(const std::vector<std::string> &terms) const;
+        [[nodiscard]] std::vector<std::filesystem::directory_entry>
+        searchMany(const std::vector<std::string> &terms) const;
 
         /*!
          * \brief Returns the current search depth.

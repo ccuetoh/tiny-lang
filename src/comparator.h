@@ -112,7 +112,7 @@ namespace tiny {
             }
 
             unsigned long start = s.getIndex();
-            unsigned long  end = start + maxLength;
+            unsigned long end = start + maxLength;
 
             while (end > start) {
                 auto seq = s.getVector(start, end);

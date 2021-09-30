@@ -11,7 +11,8 @@ tiny::Lexeme tiny::Parser::consume(const tiny::Token &token) {
     }
 
     if (token != got.token) {
-        throw ParseError("Unexpected token: expected " + tiny::Lexeme(token).string() + " but got " + got.string(), got.metadata);
+        throw ParseError("Unexpected token: expected " + tiny::Lexeme(token).string() + " but got " + got.string(),
+                         got.metadata);
     }
 
     return got;

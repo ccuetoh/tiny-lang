@@ -51,7 +51,8 @@ namespace tiny {
 
     public:
         //! Constructor over the exception and stream
-        explicit ErrorBuilder(tiny::CompilerError &e, tiny::WalkableStream<std::uint32_t> &s) : exception(e), stream(s) {};
+        explicit ErrorBuilder(tiny::CompilerError &e, tiny::WalkableStream<std::uint32_t> &s) : exception(e),
+                                                                                                stream(s) {};
 
         /*!
          * \brief Logs the formatted exception to the provider logger with level Error

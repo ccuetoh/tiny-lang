@@ -22,7 +22,8 @@ int main(int argc, char **argv) {
     try {
         std::locale::global(std::locale("en_US.UTF8"));
     } catch (std::runtime_error &e) {
-        logger->warning("Unable to use 'en_US.UTF8' locale. Using the system's default ('" + std::locale().name() + "').");
+        logger->warning(
+                "Unable to use 'en_US.UTF8' locale. Using the system's default ('" + std::locale().name() + "').");
         logger->warning("Non-ASCII characters might be unrecognized.");
     }
 
@@ -109,7 +110,7 @@ int main(int argc, char **argv) {
 
     // TODO Remove. Add as cmd option
     std::ofstream jsonOut;
-    jsonOut.open ("./sandbox/ast.json");
+    jsonOut.open("./sandbox/ast.json");
     jsonOut << file.toJson().dump(4);
     jsonOut.close();
 

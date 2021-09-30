@@ -286,7 +286,7 @@ namespace tiny {
          * \param t Type of the node
          * \param c1 Child
          */
-        explicit ASTNode(tiny::ASTNodeType t, const tiny::ASTNode& c1);
+        explicit ASTNode(tiny::ASTNodeType t, const tiny::ASTNode &c1);
 
         /*!
          * \brief Constructs a node withe the given type and two children
@@ -303,7 +303,8 @@ namespace tiny {
          * \param c2 Child 2
          * \param c3 Child 3
          */
-        explicit ASTNode(tiny::ASTNodeType t, const tiny::ASTNode &c1, const tiny::ASTNode &c2, const tiny::ASTNode &c3);
+        explicit ASTNode(tiny::ASTNodeType t, const tiny::ASTNode &c1, const tiny::ASTNode &c2,
+                         const tiny::ASTNode &c3);
 
         /*!
          * \brief Constructs a node withe the given type and value
@@ -346,7 +347,7 @@ namespace tiny {
          * \brief Adds a parameter to the node
          * \param p Parameter to add
          */
-        void addParam(const tiny::Parameter& p);
+        void addParam(const tiny::Parameter &p);
 
         /*!
          * \brief Fetches a children node by type
@@ -361,7 +362,7 @@ namespace tiny {
          * \brief Adds a children node
          * \param c ASTNode to add
          */
-        void addChildren(const tiny::ASTNode& c);
+        void addChildren(const tiny::ASTNode &c);
 
         /*!
          * \brief Adds all the node in the list as children
@@ -376,14 +377,14 @@ namespace tiny {
          * \brief Creates a standard (non-aliased) import with the name of the module
          * \param modl Name of the module
          */
-        explicit Import(std::string_view modl): mod(modl) {};
+        explicit Import(std::string_view modl) : mod(modl) {};
 
         /*!
          * \brief Creates an aliased import over the name of the module
          * \param modl Name of the module
          * \param als Alias of the imported module
          */
-        explicit Import(std::string_view modl, std::string_view als): mod(modl), alias(als) {};
+        explicit Import(std::string_view modl, std::string_view als) : mod(modl), alias(als) {};
 
         //! Name of the module getting imported
         const std::string mod;
@@ -406,6 +407,7 @@ namespace tiny {
     */
     struct ASTFile {
         ASTFile() = default;
+
         /*!
          * \brief Create a full ASTFile
          * \param fn Filename
@@ -416,11 +418,11 @@ namespace tiny {
         explicit ASTFile(std::string_view fn,
                          std::string_view modl,
                          std::vector<tiny::Import> imprts,
-                         tiny::StatementList stmts):
-                            filename(fn),
-                            mod(modl),
-                            imports(std::move(imprts)),
-                            stmts(std::move(stmts)){};
+                         tiny::StatementList stmts) :
+                filename(fn),
+                mod(modl),
+                imports(std::move(imprts)),
+                stmts(std::move(stmts)) {};
 
         //! Path to the original file that created the AST
         std::string filename;

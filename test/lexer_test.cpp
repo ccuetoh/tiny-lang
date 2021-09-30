@@ -79,7 +79,6 @@ TEST(Lexer, LocaleSetup) {
     std::locale::global(std::locale("en_US.UTF8"));
 }
 
-
 TEST(Lexer, NewLine) {
     std::stringstream data;
     data << "\n";

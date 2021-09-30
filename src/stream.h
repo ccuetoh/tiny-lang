@@ -139,7 +139,8 @@ namespace tiny {
          * length of the stream.
          */
         [[nodiscard]] std::vector<T> getVector(unsigned long from, unsigned long to) {
-            return std::vector<T>(collection.begin() + from, collection.begin() + (std::min)(to, (unsigned long)(collection.size())));
+            return std::vector<T>(collection.begin() + from,
+                                  collection.begin() + (std::min)(to, (unsigned long) (collection.size())));
         }
 
         /*!

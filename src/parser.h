@@ -64,7 +64,7 @@ namespace tiny {
          * \brief Exhausts over the set of Token given
          * \param tokens The Tokens to consume
          */
-        void exhaust(const std::vector<tiny::Token>& tokens);
+        void exhaust(const std::vector<tiny::Token> &tokens);
 
         /*!
          * \brief Gets the next Token (without advancing the steam) and returns whether it matches the provided one
@@ -95,20 +95,20 @@ namespace tiny {
          * Entrypoint of the main parser. Uses recursive decent to resolve a sequence of statements of a Tiny program,
          * and returns a vector of nodes (as an AST). If the program is invalid ParseError is thrown.
          */
-        [[nodiscard]] tiny::StatementList statementList(tiny::Token stopToken=tiny::Token::None);
+        [[nodiscard]] tiny::StatementList statementList(tiny::Token stopToken = tiny::Token::None);
 
         /*!
          * \brief Consumes a single statement from the stream
          * \return An ASTNode of any of the downstream types
          */
-        [[nodiscard]] tiny::ASTNode statement(std::vector<tiny::Token> terminators={tiny::Token::NewLine});
+        [[nodiscard]] tiny::ASTNode statement(std::vector<tiny::Token> terminators = {tiny::Token::NewLine});
 
         /*!
          * \brief Consumes a single expression followed by a terminator
          * \param terminators Optional list of terminators as a vector. Defaults to only NewLine
          * \return An ASTNode of type ExpressionStatement or any of the downstream types
          */
-        [[nodiscard]] tiny::ASTNode expressionStatement(std::vector<tiny::Token> terminators={tiny::Token::NewLine});
+        [[nodiscard]] tiny::ASTNode expressionStatement(std::vector<tiny::Token> terminators = {tiny::Token::NewLine});
 
         /*!
          * \brief Consumes a block statement followed by an error handler from the stream
@@ -139,14 +139,14 @@ namespace tiny {
          * \param isPrototype Whether the parser should treat the function as a prototype function. Defaults to false
          * \return An ASTNode of type FunctionDeclaration or MethodDeclaration
          */
-        [[nodiscard]] tiny::ASTNode funcDeclStatement(bool isPrototype=false);
+        [[nodiscard]] tiny::ASTNode funcDeclStatement(bool isPrototype = false);
 
         /*!
          * \brief Consumes a list of arguments as given inside a function or method declaration
          * \param isAnonymous Whether the parser should expect no name name for the arguments. Defaults to false
          * \return An ASTNode of type FunctionArgumentDeclList with children of type FunctionArgumentDecl
          */
-        [[nodiscard]] tiny::ASTNode argumentDeclList(bool hasNamedArgs=false);
+        [[nodiscard]] tiny::ASTNode argumentDeclList(bool hasNamedArgs = false);
 
         /*!
          * \brief Consumes list of returns as given inside a function or method declaration
@@ -165,7 +165,8 @@ namespace tiny {
          * \param terminators Optional list of terminators as a vector. Defaults to only NewLine
          * \return An ASTNode of type ExpressionList with a children for each expression
          */
-        [[nodiscard]] tiny::ASTNode commaSeparatedExpressionList(const std::vector<tiny::Token>& terminators={tiny::Token::NewLine});
+        [[nodiscard]] tiny::ASTNode
+        commaSeparatedExpressionList(const std::vector<tiny::Token> &terminators = {tiny::Token::NewLine});
 
         /*!
          * \brief Consumes a struct definition from the stream
@@ -377,13 +378,13 @@ namespace tiny {
          * \return The Metadata object of the latest lexeme in the stream
          */
         [[nodiscard]] inline tiny::Metadata getMetadata() const {
-            return s.get(s.getIndex()-1).metadata;
+            return s.get(s.getIndex() - 1).metadata;
         }
 
         //! A list of skipable tokens that provide no semantic meaning
-        const std::vector<tiny::Token> SKIPABLE_TOKENS{ tiny::Token::SinglelineComment,
-                                                        tiny::Token::MultilineComment,
-                                                        tiny::Token::NewLine};
+        const std::vector<tiny::Token> SKIPABLE_TOKENS{tiny::Token::SinglelineComment,
+                                                       tiny::Token::MultilineComment,
+                                                       tiny::Token::NewLine};
 
         //! The program stream as a WalkableStream of Lexemes
         tiny::WalkableStream<tiny::Lexeme> &s;

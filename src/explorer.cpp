@@ -15,7 +15,7 @@ std::vector<std::filesystem::directory_entry> tiny::Explorer::search(const std::
 std::vector<std::filesystem::directory_entry> tiny::Explorer::searchMany(const std::vector<std::string> &terms) const {
     // Prepare filetype wildcards (ex. *.txt -> txt)
     std::vector<std::string> extensions;
-    for (const auto &term : terms) {
+    for (const auto &term: terms) {
         if (term.length() < 3) {
             continue;
         }

@@ -140,28 +140,28 @@ namespace tiny {
     //! Holds a table between keywords and their token. For example the UnicodeCodepoints for "string" maps to Token::TypeString
     static const std::map<tiny::UnicodeCodepoints, Token> KEYWORD_TABLE{
             // Keywords
-            {tiny::UnicodeParser::fromString("const"),  Token::KwConst},
-            {tiny::UnicodeParser::fromString("import"), Token::KwImport},
-            {tiny::UnicodeParser::fromString("module"), Token::KwModule},
-            {tiny::UnicodeParser::fromString("struct"), Token::KwStruct},
-            {tiny::UnicodeParser::fromString("trait"),  Token::KwTrait},
-            {tiny::UnicodeParser::fromString("func"),   Token::KwFunc},
-            {tiny::UnicodeParser::fromString("as"),     Token::KwAs},
-            {tiny::UnicodeParser::fromString("if"),     Token::KwIf},
-            {tiny::UnicodeParser::fromString("in"),     Token::KwIn},
-            {tiny::UnicodeParser::fromString("else"),   Token::KwElse},
-            {tiny::UnicodeParser::fromString("for"),    Token::KwFor},
-            {tiny::UnicodeParser::fromString("return"), Token::KwReturn},
-            {tiny::UnicodeParser::fromString("and"),    Token::KwAnd},
-            {tiny::UnicodeParser::fromString("or"),     Token::KwOr},
+            {tiny::UnicodeParser::fromString("const"),   Token::KwConst},
+            {tiny::UnicodeParser::fromString("import"),  Token::KwImport},
+            {tiny::UnicodeParser::fromString("module"),  Token::KwModule},
+            {tiny::UnicodeParser::fromString("struct"),  Token::KwStruct},
+            {tiny::UnicodeParser::fromString("trait"),   Token::KwTrait},
+            {tiny::UnicodeParser::fromString("func"),    Token::KwFunc},
+            {tiny::UnicodeParser::fromString("as"),      Token::KwAs},
+            {tiny::UnicodeParser::fromString("if"),      Token::KwIf},
+            {tiny::UnicodeParser::fromString("in"),      Token::KwIn},
+            {tiny::UnicodeParser::fromString("else"),    Token::KwElse},
+            {tiny::UnicodeParser::fromString("for"),     Token::KwFor},
+            {tiny::UnicodeParser::fromString("return"),  Token::KwReturn},
+            {tiny::UnicodeParser::fromString("and"),     Token::KwAnd},
+            {tiny::UnicodeParser::fromString("or"),      Token::KwOr},
 
             // Types
 
             // Integer
-            {tiny::UnicodeParser::fromString("int"),    Token::TypeInt32}, // int is an alias for int32
-            {tiny::UnicodeParser::fromString("int16"),  Token::TypeInt16},
-            {tiny::UnicodeParser::fromString("int32"),  Token::TypeInt32},
-            {tiny::UnicodeParser::fromString("int64"),  Token::TypeInt64},
+            {tiny::UnicodeParser::fromString("int"),     Token::TypeInt32}, // int is an alias for int32
+            {tiny::UnicodeParser::fromString("int16"),   Token::TypeInt16},
+            {tiny::UnicodeParser::fromString("int32"),   Token::TypeInt32},
+            {tiny::UnicodeParser::fromString("int64"),   Token::TypeInt64},
 
             // Fixed-point
             {tiny::UnicodeParser::fromString("fixed"),   Token::TypeFixed32}, // fixed is an alias for fixed32

@@ -7,7 +7,7 @@ void tiny::ErrorBuilder::log(tiny::Logger &l) const {
     auto context = exception.meta.getContext(stream);
 
     l.error("In file \"" + exception.meta.filename + "\" in line " + std::to_string(pos.first) +
-             ", column " + std::to_string(pos.second) + ": ");
+            ", column " + std::to_string(pos.second) + ": ");
 
     l.error("\t" + context.first);
     l.error("\t" + std::string((std::max)(context.second - 2, 0), ' ') + std::string(3, '^'));

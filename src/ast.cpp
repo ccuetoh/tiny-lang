@@ -1,15 +1,16 @@
 #include "ast.h"
 
-tiny::ASTNode::ASTNode(tiny::ASTNodeType t, const tiny::ASTNode &c1): type(t) {
+tiny::ASTNode::ASTNode(tiny::ASTNodeType t, const tiny::ASTNode &c1) : type(t) {
     addChildren(c1);
 }
 
-tiny::ASTNode::ASTNode(tiny::ASTNodeType t, const tiny::ASTNode &c1, const tiny::ASTNode &c2): type(t) {
+tiny::ASTNode::ASTNode(tiny::ASTNodeType t, const tiny::ASTNode &c1, const tiny::ASTNode &c2) : type(t) {
     addChildren(c1);
     addChildren(c2);
 }
 
-tiny::ASTNode::ASTNode(tiny::ASTNodeType t, const tiny::ASTNode &c1, const tiny::ASTNode &c2, const tiny::ASTNode &c3): type(t) {
+tiny::ASTNode::ASTNode(tiny::ASTNodeType t, const tiny::ASTNode &c1, const tiny::ASTNode &c2, const tiny::ASTNode &c3)
+        : type(t) {
     addChildren(c1);
     addChildren(c2);
     addChildren(c3);
@@ -26,7 +27,7 @@ nlohmann::json tiny::ASTFile::toJson() const {
         jsonImports.push_back(i.toJson());
     }
 
-    return nlohmann::json {
+    return nlohmann::json{
             {"file", {
                     {"path", filename},
                     {"module", mod},
@@ -222,7 +223,7 @@ std::string tiny::ASTNode::toString() const {
 
 nlohmann::json tiny::Parameter::toJson() const {
     return nlohmann::json{
-            {"type", toString()},
+            {"type",  toString()},
             {"value", tiny::toString(val)}
     };
 }
@@ -296,7 +297,7 @@ std::string tiny::toString(tiny::Value val) {
 }
 
 std::optional<tiny::Parameter> tiny::ASTNode::getParam(tiny::ParameterType t) const {
-    for (const auto &p: params){
+    for (const auto &p: params) {
         if (p.type == t) {
             return p;
         }
@@ -305,12 +306,12 @@ std::optional<tiny::Parameter> tiny::ASTNode::getParam(tiny::ParameterType t) co
     return {};
 }
 
-void tiny::ASTNode::addParam(const tiny::Parameter& p) {
+void tiny::ASTNode::addParam(const tiny::Parameter &p) {
     params.push_back(p);
 }
 
 std::optional<std::shared_ptr<tiny::ASTNode>> tiny::ASTNode::getChildren(tiny::ASTNodeType t) {
-    for (const auto &c: children){
+    for (const auto &c: children) {
         if (c->type == t) {
             return c;
         }
