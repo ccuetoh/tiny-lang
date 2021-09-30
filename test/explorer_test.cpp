@@ -1,7 +1,3 @@
-//
-// Created by Camilo Hernández on 19-03-2021.
-//
-
 #include "gtest/gtest.h"
 
 #include "explorer.h"

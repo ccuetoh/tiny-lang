@@ -1,7 +1,3 @@
-//
-// Created by Camilo Hernández on 20-06-2021.
-//
-
 #include "gtest/gtest.h"
 
 #include "stream.h"
