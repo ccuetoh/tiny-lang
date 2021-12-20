@@ -8,8 +8,7 @@ set(CMAKE_CXX_STANDARD 17)
 include(FetchContent)
 FetchContent_Declare(
         googletest
-        GIT_REPOSITORY https://github.com/google/googletest.git
-        GIT_TAG master
+        URL https://github.com/google/googletest/archive/97a467571a0f615a4d96e79e4399c43221ca1232.zip
         SOURCE_DIR "${CMAKE_CURRENT_BINARY_DIR}/googletest-src"
         BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}/googletest-build"
 )
