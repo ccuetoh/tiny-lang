@@ -48,11 +48,21 @@ namespace tiny {
         TypeInt32, // int32, int
         TypeInt64, // int64
 
+        TypeUInt8, // uint8
+        TypeUInt16, // uint16
+        TypeUInt32, // uint32, uint
+        TypeUInt64, // uint64
+
         // Fixed-point
         TypeFixed8, // fixed8
         TypeFixed16, // fixed16
         TypeFixed32, // fixed32, fixed
         TypeFixed64, // fixed64
+
+        TypeUFixed8, // ufixed8
+        TypeUFixed16, // ufixed16
+        TypeUFixed32, // ufixed32, ufixed
+        TypeUFixed64, // ufixed64
 
         // Floating-point
         TypeFloat8, // float8
@@ -163,11 +173,21 @@ namespace tiny {
             {tiny::UnicodeParser::fromString("int32"),   Token::TypeInt32},
             {tiny::UnicodeParser::fromString("int64"),   Token::TypeInt64},
 
+            {tiny::UnicodeParser::fromString("uint"),     Token::TypeUInt32}, // uint is an alias for uint32
+            {tiny::UnicodeParser::fromString("uint16"),   Token::TypeUInt16},
+            {tiny::UnicodeParser::fromString("uint32"),   Token::TypeUInt32},
+            {tiny::UnicodeParser::fromString("uint64"),   Token::TypeUInt64},
+
             // Fixed-point
             {tiny::UnicodeParser::fromString("fixed"),   Token::TypeFixed32}, // fixed is an alias for fixed32
             {tiny::UnicodeParser::fromString("fixed16"), Token::TypeFixed16},
             {tiny::UnicodeParser::fromString("fixed32"), Token::TypeFixed32},
             {tiny::UnicodeParser::fromString("fixed64"), Token::TypeFixed64},
+
+            {tiny::UnicodeParser::fromString("ufixed"),   Token::TypeUFixed32}, // ufixed is an alias for ufixed32
+            {tiny::UnicodeParser::fromString("ufixed16"), Token::TypeUFixed16},
+            {tiny::UnicodeParser::fromString("ufixed32"), Token::TypeUFixed32},
+            {tiny::UnicodeParser::fromString("ufixed64"), Token::TypeUFixed64},
 
             // Floating-point
             {tiny::UnicodeParser::fromString("float"),   Token::TypeFloat32}, // float is an alias for float32
@@ -192,6 +212,8 @@ namespace tiny {
 
     //! A Lexeme is the product of the Lexer. It defines a token and optionally it's associated data.
     struct Lexeme {
+        explicit Lexeme() = default;
+
         /*!
          * \brief Create a lexeme with a blank value
          * \param token Token held by the Lexeme

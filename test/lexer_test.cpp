@@ -126,7 +126,7 @@ TEST(Lexer, Keywords) {
 
 TEST(Lexer, Ints) {
     std::stringstream data;
-    data << "int int16 int32 int64";
+    data << "int int16 int32 int64 uint uint16 uint32 uint64";
 
     tiny::Lexer lexer(data);
 
@@ -136,6 +136,10 @@ TEST(Lexer, Ints) {
             tiny::Lexeme(tiny::Token::TypeInt16),
             tiny::Lexeme(tiny::Token::TypeInt32),
             tiny::Lexeme(tiny::Token::TypeInt64),
+            tiny::Lexeme(tiny::Token::TypeUInt32),
+            tiny::Lexeme(tiny::Token::TypeUInt16),
+            tiny::Lexeme(tiny::Token::TypeUInt32),
+            tiny::Lexeme(tiny::Token::TypeUInt64),
     };
 
     ASSERT_EQ(lexemes, expect);
@@ -143,7 +147,7 @@ TEST(Lexer, Ints) {
 
 TEST(Lexer, Fixed) {
     std::stringstream data;
-    data << "fixed fixed16 fixed32 fixed64";
+    data << "fixed fixed16 fixed32 fixed64 ufixed ufixed16 ufixed32 ufixed64";
 
     tiny::Lexer lexer(data);
 
@@ -153,6 +157,10 @@ TEST(Lexer, Fixed) {
             tiny::Lexeme(tiny::Token::TypeFixed16),
             tiny::Lexeme(tiny::Token::TypeFixed32),
             tiny::Lexeme(tiny::Token::TypeFixed64),
+            tiny::Lexeme(tiny::Token::TypeUFixed32),
+            tiny::Lexeme(tiny::Token::TypeUFixed16),
+            tiny::Lexeme(tiny::Token::TypeUFixed32),
+            tiny::Lexeme(tiny::Token::TypeUFixed64),
     };
 
     ASSERT_EQ(lexemes, expect);
