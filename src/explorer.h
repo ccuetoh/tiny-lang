@@ -16,12 +16,21 @@ namespace tiny {
 
         /*!
          * \brief Creates an Explorer instance with the base directory set to the given path.
-         * \param baseDirectory Root to search in
+         * \param path Root to search in
          *
          * Creates an Explorer instance with the base directory set to the given path. If the given directory does not
          * exist, a std::runtime_exception will get thrown on creation.
          */
-        explicit Explorer(std::string_view baseDirectory) : baseDirectory(baseDirectory) {};
+        explicit Explorer(std::string_view path) : path(path) {};
+
+        /*!
+         * \brief Creates an Explorer instance with the base directory set to the given path.
+         * \param path Root to search in
+         *
+         * Creates an Explorer instance with the base directory set to the given path. If the given directory does not
+         * exist, a std::runtime_exception will get thrown on creation.
+         */
+        explicit Explorer(std::filesystem::path path) : path(std::move(path)) {};
 
         /*!
          * \brief Iterates over the set directory and searches for a matching filename
@@ -37,10 +46,11 @@ namespace tiny {
         /*!
          * \brief Executes a search over multiple terms. See the documentation for the 'search' function.
          * \param terms A full filename or an extension wildcard
+         * \param folders A vector of folders allowed to be searched on. If empty, all folders are allowed
          * \return A vector with the results of the search. Empty vector if no matches where found.
          */
         [[nodiscard]] std::vector<std::filesystem::directory_entry>
-        searchMany(const std::vector<std::string> &terms) const;
+        searchMany(const std::vector<std::string> &terms, const std::vector<std::string> &folders = {}) const;
 
         /*!
          * \brief Returns the current search depth.
@@ -56,7 +66,7 @@ namespace tiny {
 
     private:
         //! The root directory for the search.
-        std::string baseDirectory = std::filesystem::current_path().string();
+        std::filesystem::path path = std::filesystem::current_path();
 
         //! The maximum allowed search depth. Defaults to 1.
         std::int32_t searchDepth = 1;

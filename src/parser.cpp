@@ -1,4 +1,5 @@
 #include "parser.h"
+#include "errors.h"
 
 #include <utility>
 
@@ -7,11 +8,11 @@ tiny::Lexeme tiny::Parser::consume(const tiny::Token &token) {
 
     if (s.isTerminator(got)) {
         // Use the metadata of the last token
-        throw ParseError("Unexpected end-of-file", getMetadata());
+        throw tiny::ParseError("Unexpected end-of-file", getMetadata());
     }
 
     if (token != got.token) {
-        throw ParseError("Unexpected token: expected " + tiny::Lexeme(token).string() + " but got " + got.string(),
+        throw tiny::ParseError("Unexpected token: expected " + tiny::Lexeme(token).string() + " but got " + got.string(),
                          got.metadata);
     }
 
@@ -309,7 +310,7 @@ tiny::ASTNode tiny::Parser::rangeExpression() {
     }
 
     if (consumeOptional(tiny::Token::Step)) {
-        node.addChildren(tiny::ASTNode(tiny::ASTNodeType::RangeStepExpression, additiveExpression())); // Step
+        node.addChildren(tiny::ASTNode(tiny::ASTNodeType::RangeStepExpression, additiveExpression())); // StageStep
     } else {
         node.addChildren(tiny::ASTNode(tiny::ASTNodeType::RangeStepExpression)); // Placeholder step
     }

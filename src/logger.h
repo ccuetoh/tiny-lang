@@ -6,14 +6,21 @@
 #include <mutex>
 
 #if defined(_WIN32)
-
 #include <windows.h>
-
 #endif
 
 namespace tiny {
     // Forward declaration
     struct LogMsg;
+
+    //! Logging levels. When a level is selected, messages with a higher level will not be logged.
+    enum class LogLv {
+        Debug,
+        Info,
+        Warning,
+        Error,
+        Fatal,
+    };
 
     /*!
      * \brief The Logger class handles formatted and pretty logging
@@ -35,26 +42,17 @@ namespace tiny {
             return instance;
         }
 
-        //! Logging levels. When a level is selected, messages with a higher level will not be logged.
-        enum class Level {
-            Debug,
-            Info,
-            Warning,
-            Error,
-            Fatal,
-        };
-
         /*!
          * \brief Sets the current logging level
          * \param lv Logging level
          */
-        void setLevel(Logger::Level lv);
+        void setLevel(tiny::LogLv lv);
 
         /*!
         * \brief Gets the current logging level
         * \return Current logging level
         */
-        [[nodiscard]] tiny::Logger::Level getLevel() const;
+        [[nodiscard]] tiny::LogLv getLevel() const;
 
         /*!
         * \brief Logs a message using its logging level
@@ -64,10 +62,10 @@ namespace tiny {
 
         /*!
         * \brief Logs a message overriding its logging level to the given Level
+        * \param lv Level to log at
         * \param msg Message to log
-         *\param lv Level to log at
         */
-        void log(const std::string &msg, Logger::Level lv);
+        void log(tiny::LogLv lv, const std::string &msg);
 
         /*!
         * \brief Logs a message at the Debug level
@@ -109,7 +107,7 @@ namespace tiny {
         std::mutex mutex;
 
         //! Current logging-level. Defaults to Info.
-        tiny::Logger::Level level = Logger::Level::Info;
+        tiny::LogLv level = LogLv::Info;
     };
 
     //! Defines a message for the Logger.
@@ -119,20 +117,20 @@ namespace tiny {
         * \param level The logging level
         * \param msg Content of the message
         */
-        LogMsg(Logger::Level level, std::string msg) : level(level), content(std::move(msg)) {}
+        LogMsg(tiny::LogLv level, std::string msg) : level(level), content(std::move(msg)) {}
 
         //! Content of the log
         std::string content;
 
         //! Level of the error
-        Logger::Level level = Logger::Level::Info;
+        tiny::LogLv level = tiny::LogLv::Info;
 
         /*!
         * \brief Returns a string with the logging level's name (Debug will return "DEBUG)
         * \param lv The logging level
         * \return An uppercase string with the logging level's name
         */
-        static std::string levelToString(Logger::Level lv);
+        static std::string levelToString(LogLv lv);
 
         /*!
         * \brief Returns the a console color based on the level provided
@@ -142,7 +140,7 @@ namespace tiny {
         * Returns the a console color based on the level provided. The color varies depending on the host OS. In
         * Windows systems the Windows' API coloring code is provided, otherwise the ANSI escape code color is returned.
         */
-        [[nodiscard]] static std::int32_t levelColour(Logger::Level lv);
+        [[nodiscard]] static std::int32_t levelColour(LogLv lv);
     };
 }
 

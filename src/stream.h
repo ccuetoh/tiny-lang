@@ -16,6 +16,11 @@ namespace tiny {
     class WalkableStream {
     public:
         /*!
+         * \brief Creates an empty stream
+         */
+        explicit WalkableStream() =  default;
+
+        /*!
          * \brief Use a collection for the creation of the stream and provide a terminator value
          * \param col A vector of items to add to the stream
          * \param terminator An optional terminator to return if the stream's length is exceeded
@@ -60,7 +65,7 @@ namespace tiny {
          * Fetches the next item without stepping over it, and keeps the index position the same. If the index is over
          * the length of the collection, a terminator value will be returned
          */
-        [[nodiscard]] T peek() {
+        [[nodiscard]] T peek() const {
             if (index >= collection.size()) {
                 return terminator;
             }
@@ -121,7 +126,7 @@ namespace tiny {
          * Get the i-th element on the stream. If the index is over the length of the collection, a terminator value
          * will be returned
          */
-        [[nodiscard]] T get(unsigned long i) {
+        [[nodiscard]] T get(unsigned long i) const {
             if (i >= collection.size()) {
                 return terminator;
             }
@@ -138,7 +143,7 @@ namespace tiny {
          * Gets a vector spanning [from:to[. The to parameter is bound-checked, and will return a vector up to the
          * length of the stream.
          */
-        [[nodiscard]] std::vector<T> getVector(unsigned long from, unsigned long to) {
+        [[nodiscard]] std::vector<T> getVector(unsigned long from, unsigned long to) const {
             return std::vector<T>(collection.begin() + from,
                                   collection.begin() + (std::min)(to, (unsigned long) (collection.size())));
         }
@@ -147,7 +152,7 @@ namespace tiny {
          * \brief Get a vector as a copy of the internal collection of the stream
          * \return A vector copy of the stream
          */
-        [[nodiscard]] std::vector<T> getVector() {
+        [[nodiscard]] std::vector<T> getVector() const {
             return std::vector<T>(collection.begin(), collection.begin() + collection.size());
         }
 

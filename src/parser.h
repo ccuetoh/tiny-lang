@@ -16,6 +16,11 @@ namespace tiny {
     class Parser {
     public:
         /*!
+         * \brief Constructs an empty parser
+         */
+        explicit Parser() = default;
+
+        /*!
          * \brief Constructor from a WalkableStream
          * \param stream WalkableStream of Lexemes that represent a Tiny file
          */
@@ -389,7 +394,7 @@ namespace tiny {
                                                        tiny::Token::NewLine};
 
         //! The program stream as a WalkableStream of Lexemes
-        tiny::WalkableStream<tiny::Lexeme> &s;
+        tiny::WalkableStream<tiny::Lexeme> s;
 
     };
 }

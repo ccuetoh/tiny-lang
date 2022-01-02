@@ -1,14 +1,14 @@
 #include "logger.h"
 
-void tiny::Logger::setLevel(tiny::Logger::Level lv) {
+void tiny::Logger::setLevel(tiny::LogLv lv) {
     level = lv;
 }
 
-tiny::Logger::Level tiny::Logger::getLevel() const {
+tiny::LogLv tiny::Logger::getLevel() const {
     return level;
 }
 
-void tiny::Logger::log(const std::string &msg, Logger::Level lv) {
+void tiny::Logger::log(LogLv lv, const std::string &msg) {
     LogMsg logMsg(lv, msg);
     log(logMsg);
 }
@@ -44,63 +44,63 @@ void tiny::Logger::log(const tiny::LogMsg &msg) {
 }
 
 void tiny::Logger::debug(const std::string &msg) {
-    log(msg, Level::Debug);
+    log(LogLv::Debug, msg);
 }
 
 void tiny::Logger::info(const std::string &msg) {
-    log(msg, Level::Info);
+    log(LogLv::Info, msg);
 }
 
 void tiny::Logger::warning(const std::string &msg) {
-    log(msg, Level::Warning);
+    log(LogLv::Warning, msg);
 }
 
 void tiny::Logger::error(const std::string &msg) {
-    log(msg, Level::Error);
+    log(LogLv::Error, msg);
 }
 
 void tiny::Logger::fatal(const std::string &msg) {
-    log(msg, Level::Fatal);
+    log(LogLv::Fatal, msg);
 }
 
-std::string tiny::LogMsg::levelToString(Logger::Level lv) {
+std::string tiny::LogMsg::levelToString(LogLv lv) {
     switch (lv) {
-        case Logger::Level::Debug:
+        case LogLv::Debug:
             return "DEBUG";
-        case Logger::Level::Info:
+        case LogLv::Info:
             return "INFO";
-        case Logger::Level::Warning:
+        case LogLv::Warning:
             return "WARNING";
-        case Logger::Level::Error:
+        case LogLv::Error:
             return "ERROR";
-        case Logger::Level::Fatal:
+        case LogLv::Fatal:
             return "FATAL";
         default:
             return "?";
     }
 }
 
-std::int32_t tiny::LogMsg::levelColour(tiny::Logger::Level lv) {
+std::int32_t tiny::LogMsg::levelColour(tiny::LogLv lv) {
     switch (lv) {
 #if defined(_WIN32)
-        case Logger::Level::Debug:
+        case LogLv::Debug:
             return 15;
-        case Logger::Level::Info:
+        case LogLv::Info:
             return 9;
-        case Logger::Level::Warning:
+        case LogLv::Warning:
             return 14;
-        case Logger::Level::Error:
-        case Logger::Level::Fatal:
+        case LogLv::Error:
+        case LogLv::Fatal:
             return 12;
 #else
-            case Logger::Level::Debug:
+            case LogLv::Debug:
                 return 37;
-            case Logger::Level::Info:
+            case LogLv::Info:
                 return 34;
-            case Logger::Level::Warning:
+            case LogLv::Warning:
                 return 33;
-            case Logger::Level::Error:
-            case Logger::Level::Fatal:
+            case LogLv::Error:
+            case LogLv::Fatal:
                 return 31;
 #endif
         default:

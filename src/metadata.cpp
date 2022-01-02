@@ -32,7 +32,7 @@ tiny::Metadata::getContext(tiny::WalkableStream<std::uint32_t> &s, std::int32_t 
     // Backup until a newline is found or the range is exceeded
     for (; errPos < range / 2; errPos++) {
         if (s.peek() == '\n') {
-            s.skip(); // Step over the newline
+            s.skip(); // StageStep over the newline
             break;
         }
 

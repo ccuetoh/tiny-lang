@@ -1,5 +1,5 @@
-#include "parser.h"
 #include "lexer.h"
+#include "errors.h"
 
 std::vector<tiny::Lexeme> tiny::Lexer::lexAll() {
     std::vector<tiny::Lexeme> lexemes;
@@ -155,7 +155,7 @@ tiny::Lexeme tiny::Lexer::lexNumericLiteral() {
 
         if (s.peek() == 'x') {
             // Prefixed hexadecimal literal (0xFFFF)
-            number.push_back(s.get());
+            number.push_back(char(s.get()));
             isHex = true;
         }
     }
@@ -193,7 +193,7 @@ tiny::Lexeme tiny::Lexer::lexStrLiteral() {
         throw tiny::LexError("End-of-file while parsing string literal", meta);
     }
 
-    s.skip(); // Step-over the first "
+    s.skip(); // StageStep-over the first "
 
     tiny::UnicodeCodepoints str;
     for (std::uint32_t peek = s.peek(); peek != '"'; peek = s.peek()) {
@@ -205,7 +205,7 @@ tiny::Lexeme tiny::Lexer::lexStrLiteral() {
         str.push_back(s.get());
     }
 
-    s.skip(); // Step-over the second "
+    s.skip(); // StageStep-over the second "
 
     return Lexeme(tiny::Token::LiteralStr, tiny::UnicodeParser::toString(str), meta);
 }
@@ -218,7 +218,7 @@ tiny::Lexeme tiny::Lexer::lexCharLiteral() {
         throw tiny::LexError("End-of-file while parsing char literal", meta);
     }
 
-    s.skip(); // Step-over the first '
+    s.skip(); // StageStep-over the first '
 
     std::uint32_t next = s.get();
     if (s.get() != '\'') {
@@ -344,7 +344,7 @@ std::string tiny::Lexeme::string() const {
         case Token::Range:
             return "<Range>";
         case Token::Step:
-            return "<Step>";
+            return "<StageStep>";
 
             // Comparators
         case Token::Eq:
@@ -471,6 +471,6 @@ tiny::UnicodeCodepoints tiny::getTypeName(tiny::Token t) {
             return tiny::UnicodeParser::fromString("dict");
 
         default:
-            return tiny::UnicodeCodepoints();
+            return {};
     }
 }

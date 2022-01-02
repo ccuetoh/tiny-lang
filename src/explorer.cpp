@@ -9,10 +9,11 @@ void tiny::Explorer::setSearchDepth(std::int32_t depth) {
 }
 
 std::vector<std::filesystem::directory_entry> tiny::Explorer::search(const std::string &term) const {
-    return searchMany(std::vector<std::string>{term});
+    return searchMany({term});
 }
 
-std::vector<std::filesystem::directory_entry> tiny::Explorer::searchMany(const std::vector<std::string> &terms) const {
+std::vector<std::filesystem::directory_entry> tiny::Explorer::searchMany(const std::vector<std::string> &terms,
+                                                                         const std::vector<std::string> &folders) const {
     // Prepare filetype wildcards (ex. *.txt -> txt)
     std::vector<std::string> extensions;
     for (const auto &term: terms) {
@@ -27,7 +28,7 @@ std::vector<std::filesystem::directory_entry> tiny::Explorer::searchMany(const s
 
     // Iterate over the file tree
     std::vector<std::filesystem::directory_entry> matches;
-    auto i = std::filesystem::recursive_directory_iterator(baseDirectory);
+    auto i = std::filesystem::recursive_directory_iterator(path);
     for (auto &p: i) {
         if (i.depth() > searchDepth) {
             continue;
@@ -37,8 +38,17 @@ std::vector<std::filesystem::directory_entry> tiny::Explorer::searchMany(const s
             continue;
         }
 
+        if (!folders.empty() && i.depth() > 1) {
+            // Folders whitelist
+
+            auto parent = std::filesystem::path(p).parent_path();
+            if (std::find(folders.begin(), folders.end(), parent) == folders.end()) {
+                continue; // Not in whitelist
+            }
+        }
+
         // Try to match the extension
-        for (auto &ext: extensions) {
+        for (auto const &ext: extensions) {
             if (p.path().extension() == ext) {
                 matches.push_back(p);
                 break;

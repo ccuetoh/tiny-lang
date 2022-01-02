@@ -1,7 +1,3 @@
-//
-// Created by Camilo Hernández on 18-07-2021.
-//
-
 #ifndef TINY_AST_H
 #define TINY_AST_H
 
@@ -387,7 +383,7 @@ namespace tiny {
         explicit Import(std::string_view modl, std::string_view als) : mod(modl), alias(als) {};
 
         //! Name of the module getting imported
-        const std::string mod;
+        std::string mod;
         //! Optional alias for the import
         std::string alias;
 
@@ -438,6 +434,14 @@ namespace tiny {
          * \return A nlohmann::json with the data of the ASTFile
          */
         [[nodiscard]] nlohmann::json toJson() const;
+
+        /*!
+         * TODO
+         * \brief Deserializes a JSON object into a file
+         * \return An ASTFile with the reconstructed data
+         *
+         * [[nodiscard]] tiny::ASTFile fromJson(nlohmann::json) const;
+         */
     };
 }
 

@@ -9,7 +9,6 @@
 #include <locale>
 
 #include "stream.h"
-#include "errors.h"
 #include "comparator.h"
 #include "metadata.h"
 
@@ -174,6 +173,7 @@ namespace tiny {
             {tiny::UnicodeParser::fromString("int64"),   Token::TypeInt64},
 
             {tiny::UnicodeParser::fromString("uint"),     Token::TypeUInt32}, // uint is an alias for uint32
+            {tiny::UnicodeParser::fromString("uint8"),   Token::TypeUInt8},
             {tiny::UnicodeParser::fromString("uint16"),   Token::TypeUInt16},
             {tiny::UnicodeParser::fromString("uint32"),   Token::TypeUInt32},
             {tiny::UnicodeParser::fromString("uint64"),   Token::TypeUInt64},
@@ -185,6 +185,7 @@ namespace tiny {
             {tiny::UnicodeParser::fromString("fixed64"), Token::TypeFixed64},
 
             {tiny::UnicodeParser::fromString("ufixed"),   Token::TypeUFixed32}, // ufixed is an alias for ufixed32
+            {tiny::UnicodeParser::fromString("ufixed8"), Token::TypeUFixed8},
             {tiny::UnicodeParser::fromString("ufixed16"), Token::TypeUFixed16},
             {tiny::UnicodeParser::fromString("ufixed32"), Token::TypeUFixed32},
             {tiny::UnicodeParser::fromString("ufixed64"), Token::TypeUFixed64},
@@ -347,10 +348,15 @@ namespace tiny {
     class Lexer {
     public:
         /*!
+         * \brief Builds an empty Lexer
+         */
+        explicit Lexer() = default;
+
+        /*!
          * \brief Builds the Lexer stream from a WalkableStream<char>
          * \param stream The character stream to feed into the Lexer
          */
-        explicit Lexer(tiny::WalkableStream<std::uint32_t> &stream) : s(stream) {};
+        explicit Lexer(tiny::WalkableStream<std::uint32_t> stream) : s(std::move(stream)) {};
 
         /*!
          * \brief Builds the lexer stream from an std::istream
@@ -444,7 +450,7 @@ namespace tiny {
         static const char StreamTerminator = '\0';
 
         //! The source-code stream
-        tiny::WalkableStream<std::uint32_t> s;
+        tiny::WalkableStream<std::uint32_t> s{};
 
         /*!
          * \brief Lexes an identifier from the stream
@@ -485,7 +491,7 @@ namespace tiny {
         std::string filename;
 
         //! Current token's metadata
-        tiny::Metadata getMetadata() const;
+        [[nodiscard]] tiny::Metadata getMetadata() const;
     };
 }
 
