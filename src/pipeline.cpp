@@ -5,7 +5,7 @@
 #include "parser.h"
 
 template<typename Output>
-std::string tiny::Stage<Output>::getStepName() const {
+std::string tiny::PipelineStage<Output>::getStepName() const {
     switch (step) {
         case tiny::CompilationStep::FileSelection:
             return "FileSelection";
@@ -20,15 +20,15 @@ std::string tiny::Stage<Output>::getStepName() const {
     }
 }
 
-void tiny::Pipeline::addFileSelectionStage(const tiny::Stage<std::vector<tiny::File>> &s) {
+void tiny::Pipeline::addFileSelectionStage(const tiny::PipelineStage<std::vector<tiny::File>> &s) {
     fileSelectionStages.push_back(s);
 }
 
-void tiny::Pipeline::addLexStage(const tiny::Stage<std::vector<tiny::Lexeme>> &s) {
+void tiny::Pipeline::addLexStage(const tiny::PipelineStage<std::vector<tiny::Lexeme>> &s) {
     lexStages.push_back(s);
 }
 
-void tiny::Pipeline::addParseStage(const tiny::Stage<tiny::ASTFile> &s) {
+void tiny::Pipeline::addParseStage(const tiny::PipelineStage<tiny::ASTFile> &s) {
     parseStages.push_back(s);
 }
 
@@ -48,7 +48,7 @@ std::uint64_t tiny::Pipeline::getPipeLength(tiny::CompilationStep step) const {
 }
 
 
-std::vector<tiny::File> tiny::Pipeline::runFileSelectionPipe(std::vector<tiny::File> &files) {
+std::vector<tiny::File> tiny::Pipeline::runFileSelectionPipe(std::vector<tiny::File> &files) const {
     for (const auto &s: fileSelectionStages) {
         auto res = s.task(files);
         files = res.output;
@@ -68,7 +68,7 @@ std::vector<tiny::File> tiny::Pipeline::runFileSelectionPipe(std::vector<tiny::F
     return files;
 }
 
-std::vector<tiny::Lexeme> tiny::Pipeline::runLexPipe(std::vector<tiny::Lexeme> &lexemes) {
+std::vector<tiny::Lexeme> tiny::Pipeline::runLexPipe(std::vector<tiny::Lexeme> &lexemes) const {
     for (const auto &s: lexStages) {
         auto res = s.task(lexemes);
         lexemes = res.output;
@@ -88,7 +88,7 @@ std::vector<tiny::Lexeme> tiny::Pipeline::runLexPipe(std::vector<tiny::Lexeme> &
     return lexemes;
 }
 
-tiny::ASTFile tiny::Pipeline::runParsePipe(tiny::ASTFile &files) {
+tiny::ASTFile tiny::Pipeline::runParsePipe(tiny::ASTFile &files) const {
     for (const auto &s: parseStages) {
         auto res = s.task(files);
         files = res.output;

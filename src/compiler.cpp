@@ -15,11 +15,20 @@ std::string tiny::Compiler::getSignature() {
 }
 
 tiny::CompilationResult tiny::Compiler::compile() {
+    // Run the compilation steps in sequence, and then apply the pipeline to the stage
+
     log(tiny::LogLv::Debug, getSignature());
 
     log(tiny::LogLv::Debug, "File selection stage");
 
     tiny::File meta;
+
+    /*
+     * File-selection step
+     *
+     * The file selection stage uses the FileSelector to pick the files targeted by the compiler, and fetches the metadata
+     * file. If no metadata or/and source files are found error out.
+     */
 
     try {
         meta = fileSelector.getMetaFile();
@@ -47,6 +56,7 @@ tiny::CompilationResult tiny::Compiler::compile() {
         log(tiny::LogLv::Debug, "\t" + f.path.string());
     }
 
+    // With the sources selected we run each one of them in the compiler
     std::vector<tiny::ASTFile> astFiles;
     for (auto const &f: files) {
         if (f.type == tiny::FileType::Meta) {
@@ -63,6 +73,12 @@ tiny::CompilationResult tiny::Compiler::compile() {
         std::vector<tiny::Lexeme> lexemes;
 
         log(tiny::LogLv::Debug, "Lexing..");
+
+        /*
+         * Lexing stage
+         *
+         * Separate every file in lexemes that can be used to build the parse tree
+         */
 
         try {
             lexemes = lexer.lexAll();
@@ -85,6 +101,12 @@ tiny::CompilationResult tiny::Compiler::compile() {
         tiny::Parser parser(lexemeStream);
 
         log(tiny::LogLv::Debug,"Parsing..");
+
+        /*
+         * Parse stage
+         *
+         * Use the lexemes to build an AST (Parse tree) that can represent the relationship between the lexemes
+         */
 
         tiny::ASTFile astFile;
         try {
@@ -110,6 +132,10 @@ tiny::CompilationResult tiny::Compiler::compile() {
 
         log(tiny::LogLv::Debug, "Running parse pipe with length " + std::to_string(pl.getPipeLength(tiny::CompilationStep::Parser)));
         astFile = pl.runParsePipe(astFile);
+
+        /*
+         * For now we just output the AST to a file as a JSON document
+         */
 
         // TODO Move to argument option
         std::ofstream jsonOut;
