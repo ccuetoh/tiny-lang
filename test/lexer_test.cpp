@@ -9,6 +9,7 @@
 
 #include "stream.h"
 #include "lexer.h"
+#include "errors.h"
 
 // Some helper functions for the benchmark
 
