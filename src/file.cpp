@@ -29,6 +29,6 @@ std::vector<tiny::File> tiny::FileSelector::getLocalSourceFiles() const {
 std::vector<tiny::File> tiny::FileSelector::getFiles() const {
     auto files = getLocalSourceFiles();
     files.push_back(getMetaFile());
-    
+
     return files;
 }

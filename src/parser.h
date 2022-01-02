@@ -32,7 +32,7 @@ namespace tiny {
          * \param requireModule Whether an exception is thrown if no module name is declared
          * \return An ASTFile containing the Abstract Syntax Tree and data about the program
          */
-        [[nodiscard]] tiny::ASTFile file(std::string_view filename = "", bool requireModule=true);
+        [[nodiscard]] tiny::ASTFile file(std::string_view filename = "", bool requireModule = true);
 
     private:
         /*!
@@ -87,7 +87,7 @@ namespace tiny {
          * \param optional Whether an error should be thrown when no module name is present
          * \return The name of the module
          */
-        [[nodiscard]] std::string moduleStatement(bool optional=false);
+        [[nodiscard]] std::string moduleStatement(bool optional = false);
 
         /*!
          * \brief Consumes an import statement from the stream

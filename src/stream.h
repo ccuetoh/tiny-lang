@@ -18,7 +18,7 @@ namespace tiny {
         /*!
          * \brief Creates an empty stream
          */
-        explicit WalkableStream() =  default;
+        explicit WalkableStream() = default;
 
         /*!
          * \brief Use a collection for the creation of the stream and provide a terminator value

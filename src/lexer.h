@@ -149,66 +149,66 @@ namespace tiny {
     //! Holds a table between keywords and their token. For example the UnicodeCodepoints for "string" maps to Token::TypeString
     static const std::map<tiny::UnicodeCodepoints, Token> KEYWORD_TABLE{
             // Keywords
-            {tiny::UnicodeParser::fromString("const"),   Token::KwConst},
-            {tiny::UnicodeParser::fromString("import"),  Token::KwImport},
-            {tiny::UnicodeParser::fromString("module"),  Token::KwModule},
-            {tiny::UnicodeParser::fromString("struct"),  Token::KwStruct},
-            {tiny::UnicodeParser::fromString("trait"),   Token::KwTrait},
-            {tiny::UnicodeParser::fromString("func"),    Token::KwFunc},
-            {tiny::UnicodeParser::fromString("as"),      Token::KwAs},
-            {tiny::UnicodeParser::fromString("if"),      Token::KwIf},
-            {tiny::UnicodeParser::fromString("in"),      Token::KwIn},
-            {tiny::UnicodeParser::fromString("else"),    Token::KwElse},
-            {tiny::UnicodeParser::fromString("for"),     Token::KwFor},
-            {tiny::UnicodeParser::fromString("return"),  Token::KwReturn},
-            {tiny::UnicodeParser::fromString("and"),     Token::KwAnd},
-            {tiny::UnicodeParser::fromString("or"),      Token::KwOr},
+            {tiny::UnicodeParser::fromString("const"),    Token::KwConst},
+            {tiny::UnicodeParser::fromString("import"),   Token::KwImport},
+            {tiny::UnicodeParser::fromString("module"),   Token::KwModule},
+            {tiny::UnicodeParser::fromString("struct"),   Token::KwStruct},
+            {tiny::UnicodeParser::fromString("trait"),    Token::KwTrait},
+            {tiny::UnicodeParser::fromString("func"),     Token::KwFunc},
+            {tiny::UnicodeParser::fromString("as"),       Token::KwAs},
+            {tiny::UnicodeParser::fromString("if"),       Token::KwIf},
+            {tiny::UnicodeParser::fromString("in"),       Token::KwIn},
+            {tiny::UnicodeParser::fromString("else"),     Token::KwElse},
+            {tiny::UnicodeParser::fromString("for"),      Token::KwFor},
+            {tiny::UnicodeParser::fromString("return"),   Token::KwReturn},
+            {tiny::UnicodeParser::fromString("and"),      Token::KwAnd},
+            {tiny::UnicodeParser::fromString("or"),       Token::KwOr},
 
             // Types
 
             // Integer
-            {tiny::UnicodeParser::fromString("int"),     Token::TypeInt32}, // int is an alias for int32
-            {tiny::UnicodeParser::fromString("int16"),   Token::TypeInt16},
-            {tiny::UnicodeParser::fromString("int32"),   Token::TypeInt32},
-            {tiny::UnicodeParser::fromString("int64"),   Token::TypeInt64},
+            {tiny::UnicodeParser::fromString("int"),      Token::TypeInt32}, // int is an alias for int32
+            {tiny::UnicodeParser::fromString("int16"),    Token::TypeInt16},
+            {tiny::UnicodeParser::fromString("int32"),    Token::TypeInt32},
+            {tiny::UnicodeParser::fromString("int64"),    Token::TypeInt64},
 
             {tiny::UnicodeParser::fromString("uint"),     Token::TypeUInt32}, // uint is an alias for uint32
-            {tiny::UnicodeParser::fromString("uint8"),   Token::TypeUInt8},
+            {tiny::UnicodeParser::fromString("uint8"),    Token::TypeUInt8},
             {tiny::UnicodeParser::fromString("uint16"),   Token::TypeUInt16},
             {tiny::UnicodeParser::fromString("uint32"),   Token::TypeUInt32},
             {tiny::UnicodeParser::fromString("uint64"),   Token::TypeUInt64},
 
             // Fixed-point
-            {tiny::UnicodeParser::fromString("fixed"),   Token::TypeFixed32}, // fixed is an alias for fixed32
-            {tiny::UnicodeParser::fromString("fixed16"), Token::TypeFixed16},
-            {tiny::UnicodeParser::fromString("fixed32"), Token::TypeFixed32},
-            {tiny::UnicodeParser::fromString("fixed64"), Token::TypeFixed64},
+            {tiny::UnicodeParser::fromString("fixed"),    Token::TypeFixed32}, // fixed is an alias for fixed32
+            {tiny::UnicodeParser::fromString("fixed16"),  Token::TypeFixed16},
+            {tiny::UnicodeParser::fromString("fixed32"),  Token::TypeFixed32},
+            {tiny::UnicodeParser::fromString("fixed64"),  Token::TypeFixed64},
 
             {tiny::UnicodeParser::fromString("ufixed"),   Token::TypeUFixed32}, // ufixed is an alias for ufixed32
-            {tiny::UnicodeParser::fromString("ufixed8"), Token::TypeUFixed8},
+            {tiny::UnicodeParser::fromString("ufixed8"),  Token::TypeUFixed8},
             {tiny::UnicodeParser::fromString("ufixed16"), Token::TypeUFixed16},
             {tiny::UnicodeParser::fromString("ufixed32"), Token::TypeUFixed32},
             {tiny::UnicodeParser::fromString("ufixed64"), Token::TypeUFixed64},
 
             // Floating-point
-            {tiny::UnicodeParser::fromString("float"),   Token::TypeFloat32}, // float is an alias for float32
-            {tiny::UnicodeParser::fromString("float8"),  Token::TypeFloat8},
-            {tiny::UnicodeParser::fromString("float16"), Token::TypeFloat16},
-            {tiny::UnicodeParser::fromString("float32"), Token::TypeFloat32},
-            {tiny::UnicodeParser::fromString("float64"), Token::TypeFloat64},
+            {tiny::UnicodeParser::fromString("float"),    Token::TypeFloat32}, // float is an alias for float32
+            {tiny::UnicodeParser::fromString("float8"),   Token::TypeFloat8},
+            {tiny::UnicodeParser::fromString("float16"),  Token::TypeFloat16},
+            {tiny::UnicodeParser::fromString("float32"),  Token::TypeFloat32},
+            {tiny::UnicodeParser::fromString("float64"),  Token::TypeFloat64},
 
-            {tiny::UnicodeParser::fromString("bool"),    Token::TypeBool},
-            {tiny::UnicodeParser::fromString("char"),    Token::TypeChar},
-            {tiny::UnicodeParser::fromString("string"),  Token::TypeString},
+            {tiny::UnicodeParser::fromString("bool"),     Token::TypeBool},
+            {tiny::UnicodeParser::fromString("char"),     Token::TypeChar},
+            {tiny::UnicodeParser::fromString("string"),   Token::TypeString},
 
-            {tiny::UnicodeParser::fromString("list"),    Token::TypeList},
-            {tiny::UnicodeParser::fromString("dict"),    Token::TypeDict},
+            {tiny::UnicodeParser::fromString("list"),     Token::TypeList},
+            {tiny::UnicodeParser::fromString("dict"),     Token::TypeDict},
 
-            {tiny::UnicodeParser::fromString("any"),     Token::TypeAny},
+            {tiny::UnicodeParser::fromString("any"),      Token::TypeAny},
 
-            {tiny::UnicodeParser::fromString("None"),    Token::LiteralNone},
-            {tiny::UnicodeParser::fromString("True"),    Token::LiteralTrue},
-            {tiny::UnicodeParser::fromString("False"),   Token::LiteralFalse},
+            {tiny::UnicodeParser::fromString("None"),     Token::LiteralNone},
+            {tiny::UnicodeParser::fromString("True"),     Token::LiteralTrue},
+            {tiny::UnicodeParser::fromString("False"),    Token::LiteralFalse},
     };
 
     //! A Lexeme is the product of the Lexer. It defines a token and optionally it's associated data.

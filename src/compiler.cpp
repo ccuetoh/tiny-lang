@@ -11,7 +11,7 @@ void tiny::Compiler::setLogger(tiny::Logger *l) {
 }
 
 std::string tiny::Compiler::getSignature() {
-    return TINY_NAME + " "  + TINY_VERSION + " (" + TINY_VERSION_NICKNAME + ")";
+    return TINY_NAME + " " + TINY_VERSION + " (" + TINY_VERSION_NICKNAME + ")";
 }
 
 tiny::CompilationResult tiny::Compiler::compile() {
@@ -48,7 +48,8 @@ tiny::CompilationResult tiny::Compiler::compile() {
     std::vector<tiny::File> files(sources.begin(), sources.end());
     files.push_back(meta);
 
-    log(tiny::LogLv::Debug, "Running file selection pipe with length " + std::to_string(pl.getPipeLength(tiny::CompilationStep::FileSelection)));
+    log(tiny::LogLv::Debug, "Running file selection pipe with length " +
+                            std::to_string(pl.getPipeLength(tiny::CompilationStep::FileSelection)));
     files = pl.runFileSelectionPipe(files);
 
     log(tiny::LogLv::Debug, "Selected " + std::to_string(files.size()) + " files: ");
@@ -86,21 +87,22 @@ tiny::CompilationResult tiny::Compiler::compile() {
             if (logger != nullptr) {
                 tiny::ErrorBuilder builder(e, charStream);
 
-                log(tiny::LogLv::Error,e.what());
+                log(tiny::LogLv::Error, e.what());
                 builder.log(*logger);
-                log(tiny::LogLv::Fatal,"Invalid program");
+                log(tiny::LogLv::Fatal, "Invalid program");
             }
 
             return {tiny::CompilationStatus::Error, {tiny::CompilationStep::Lexer, e.what()}};
         }
 
-        log(tiny::LogLv::Debug, "Running lex pipe with length " + std::to_string(pl.getPipeLength(tiny::CompilationStep::Lexer)));
+        log(tiny::LogLv::Debug,
+            "Running lex pipe with length " + std::to_string(pl.getPipeLength(tiny::CompilationStep::Lexer)));
         lexemes = pl.runLexPipe(lexemes);
 
         tiny::WalkableStream<tiny::Lexeme> lexemeStream(lexemes, tiny::Lexeme(tiny::Token::None));
         tiny::Parser parser(lexemeStream);
 
-        log(tiny::LogLv::Debug,"Parsing..");
+        log(tiny::LogLv::Debug, "Parsing..");
 
         /*
          * Parse stage
@@ -123,14 +125,15 @@ tiny::CompilationResult tiny::Compiler::compile() {
             return {tiny::CompilationStatus::Error, {tiny::CompilationStep::Parser, e.what()}};
 
         } catch (const std::exception &e) {
-            log(tiny::LogLv::Error,"Exception encountered while parsing");
-            log(tiny::LogLv::Error,e.what());
-            log(tiny::LogLv::Fatal,"Invalid program");
+            log(tiny::LogLv::Error, "Exception encountered while parsing");
+            log(tiny::LogLv::Error, e.what());
+            log(tiny::LogLv::Fatal, "Invalid program");
 
             return {tiny::CompilationStatus::Error, {tiny::CompilationStep::Parser, e.what()}};
         }
 
-        log(tiny::LogLv::Debug, "Running parse pipe with length " + std::to_string(pl.getPipeLength(tiny::CompilationStep::Parser)));
+        log(tiny::LogLv::Debug,
+            "Running parse pipe with length " + std::to_string(pl.getPipeLength(tiny::CompilationStep::Parser)));
         astFile = pl.runParsePipe(astFile);
 
         /*
@@ -146,7 +149,7 @@ tiny::CompilationResult tiny::Compiler::compile() {
         astFiles.push_back(astFile);
     }
 
-    log(tiny::LogLv::Info,"Done");
+    log(tiny::LogLv::Info, "Done");
 
     return {tiny::CompilationStatus::Ok};
 }

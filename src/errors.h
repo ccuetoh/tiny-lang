@@ -65,7 +65,7 @@ namespace tiny {
     };
 
     //! Gets thrown when a script in the pipeline reports an error
-    struct PipelineError: public std::exception {
+    struct PipelineError : public std::exception {
         //! Name of the stage
         const std::string &name;
 
@@ -83,8 +83,11 @@ namespace tiny {
          * \param s Stage that threw the error
          * \param msg An optional message provided from the script that explains the error
          */
-        explicit PipelineError(const std::string &name, const std::string &step_name, const std::string &msg) : name(name), step_name(step_name), msg(msg) {
-            detail = "The pipeline failed for script '" + name + "' in step " + step_name + " with the message '" + msg + "'";
+        explicit PipelineError(const std::string &name, const std::string &step_name, const std::string &msg) : name(
+                name), step_name(step_name), msg(msg) {
+            detail =
+                    "The pipeline failed for script '" + name + "' in step " + step_name + " with the message '" + msg +
+                    "'";
         };
 
         /*!
@@ -98,8 +101,11 @@ namespace tiny {
 
     //! Gets thrown when a script in the pipeline rejects the input
     struct PipelineRejectError : tiny::PipelineError {
-        explicit PipelineRejectError(const std::string &name, const std::string &step_name, const std::string &msg): tiny::PipelineError(name, step_name, msg) {
-            detail = "The pipeline failed for script '" + name + "' in step " + step_name + " with the message '" + msg + "'";
+        explicit PipelineRejectError(const std::string &name, const std::string &step_name, const std::string &msg)
+                : tiny::PipelineError(name, step_name, msg) {
+            detail =
+                    "The pipeline failed for script '" + name + "' in step " + step_name + " with the message '" + msg +
+                    "'";
         };
 
         /*!
@@ -112,7 +118,7 @@ namespace tiny {
     };
 
     //! Gets thrown when a file error is reported (such as not found or unable to open)
-    struct FileError: public std::exception {
+    struct FileError : public std::exception {
         //! An optional message describing the error
         std::string msg = "File error";
 
@@ -125,7 +131,7 @@ namespace tiny {
          * \brief Creates a new FileError with a describing error
          * \param msg An optional message that describes the error
          */
-        explicit FileError(std::string msg): msg(std::move(msg)) {};
+        explicit FileError(std::string msg) : msg(std::move(msg)) {};
 
         /*!
          * \brief Returns a C-string detailing the error
@@ -137,19 +143,18 @@ namespace tiny {
     };
 
     //! Gets thrown when the metafile is not found
-    struct MetaNotFoundError: tiny::FileError {
+    struct MetaNotFoundError : tiny::FileError {
         using FileError::FileError; // Inherit the constructor
     };
 
     //! Gets thrown when no Tiny source files are found
-    struct SourcesNotFoundError: tiny::FileError {
+    struct SourcesNotFoundError : tiny::FileError {
         using FileError::FileError; // Inherit the constructor
     };
 
     //! Gets thrown when an abstract class function is directly called
-    struct NotImplementedError : public std::logic_error
-    {
-        NotImplementedError(): std::logic_error("Not implemented") { };
+    struct NotImplementedError : public std::logic_error {
+        NotImplementedError() : std::logic_error("Not implemented") {};
     };
 }
 

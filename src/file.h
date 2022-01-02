@@ -27,10 +27,12 @@ namespace tiny {
     public:
         //! Builds a FileSelector using the current working directory
         explicit FileSelector() = default;
+
         //! Builds a FileSelector in the provided path's string representation
-        explicit FileSelector(std::string_view pth): explorer(pth), path(pth) {};
+        explicit FileSelector(std::string_view pth) : explorer(pth), path(pth) {};
+
         //! Builds a FileSelector in the provided path
-        explicit FileSelector(const std::filesystem::path& pth): explorer(pth), path(pth) {};
+        explicit FileSelector(const std::filesystem::path &pth) : explorer(pth), path(pth) {};
 
         /*!
          * \brief Tries to find the metadata file (tiny.toml). If none is found MetaNotFoundError is raised

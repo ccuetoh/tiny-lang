@@ -30,15 +30,19 @@ namespace tiny {
     //! The result produced by a stage. Contains the output and the action taken by the stage, with an optional message
     struct StageResult {
         //! Constructs a result with an action and no further output or message, should only be used on rejection without detail
-        explicit StageResult(tiny::StageAction a): action(a) {};
+        explicit StageResult(tiny::StageAction a) : action(a) {};
+
         //! Constructs a result with only the output and defaults the action to Continue
-        explicit StageResult(Output o): output(o) {};
+        explicit StageResult(Output o) : output(o) {};
+
         //! Constructs a result without output
-        StageResult(tiny::StageAction a, std::string_view msg): action(a), msg(msg){};
+        StageResult(tiny::StageAction a, std::string_view msg) : action(a), msg(msg) {};
+
         //! Constructs a result without detail message
-        StageResult(tiny::StageAction a, Output o): action(a), output(o) {};
+        StageResult(tiny::StageAction a, Output o) : action(a), output(o) {};
+
         //! Full constructor for the result
-        StageResult(tiny::StageAction a, Output o, std::string_view msg): action(a), output(o), msg(msg) {};
+        StageResult(tiny::StageAction a, Output o, std::string_view msg) : action(a), output(o), msg(msg) {};
 
         //! The action which the stage decided to take
         tiny::StageAction action = tiny::StageAction::Continue;
@@ -60,7 +64,8 @@ namespace tiny {
      */
     struct PipelineStage {
         //! Full constructor
-        PipelineStage(std::string_view name, std::function<StageResult<Output>(Output)> task): name(name), task(task) {};
+        PipelineStage(std::string_view name, std::function<StageResult<Output>(Output)> task) : name(name),
+                                                                                                task(task) {};
 
         //! Arbitrary name for this stage
         std::string name;
@@ -102,11 +107,13 @@ namespace tiny {
          * \param s A stage
          */
         void addFileSelectionStage(const tiny::PipelineStage<std::vector<tiny::File>> &s);
+
         /*!
          * \brief Adds a stage to the lexer pipe
          * \param s A stage
          */
         void addLexStage(const tiny::PipelineStage<std::vector<tiny::Lexeme>> &s);
+
         /*!
          * \brief Adds a stage to the parser pipe
          * \param s A stage
@@ -118,13 +125,15 @@ namespace tiny {
          * \param files The output of the file selector
          * \return The output of the last stage, or the unmodified input if no stages are set
          */
-        std::vector<tiny::File> runFileSelectionPipe(std::vector<tiny::File>& files) const;
+        std::vector<tiny::File> runFileSelectionPipe(std::vector<tiny::File> &files) const;
+
         /*!
          * \brief Runs back-to-back all the stages inside the lexer pipe
          * \param lexemes The output of the lexer
          * \return The output of the last stage, or the unmodified input if no stages are set
          */
         std::vector<tiny::Lexeme> runLexPipe(std::vector<tiny::Lexeme> &lexemes) const;
+
         /*!
          * \brief Runs back-to-back all the stages inside the parser pipe
          * \param files The output of the parser
@@ -140,7 +149,5 @@ namespace tiny {
         [[nodiscard]] std::uint64_t getPipeLength(tiny::CompilationStep step) const;
     };
 }
-
-
 
 #endif //TINY_PIPELINE_H
