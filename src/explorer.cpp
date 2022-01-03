@@ -1,5 +1,7 @@
 #include "explorer.h"
 
+#include <algorithm>
+
 std::int32_t tiny::Explorer::getSearchDepth() const {
     return searchDepth;
 }

@@ -314,7 +314,7 @@ namespace tiny {
         //! A vector of Parameters for this node
         std::vector<tiny::Parameter> params;
         //! A vector of the children of this node
-        std::vector<std::shared_ptr<tiny::ASTNode>> children;
+        std::vector<std::shared_ptr<tiny::ASTNode>> children; // TODO Perhaps use just the object to avoid memory fragmentation?
         //! The optional value held by this node
         tiny::Value val;
 

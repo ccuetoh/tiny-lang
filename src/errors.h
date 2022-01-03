@@ -29,7 +29,7 @@ namespace tiny {
          * \brief Returns a C-string detailing the error
          * \return A C-string with an explanation of the error
          */
-        [[nodiscard]] const char *what() const override {
+        [[nodiscard]] const char *what() const noexcept override {
             return msg.c_str();
         }
     };
@@ -94,7 +94,7 @@ namespace tiny {
          * \brief Returns a C-string detailing the error
          * \return A C-string with an explanation of the error
          */
-        [[nodiscard]] const char *what() const override {
+        [[nodiscard]] const char *what() const noexcept override {
             return detail.c_str();
         }
     };
@@ -112,7 +112,7 @@ namespace tiny {
          * \brief Returns a C-string detailing the error
          * \return A C-string with an explanation of the error
          */
-        [[nodiscard]] const char *what() const override {
+        [[nodiscard]] const char *what() const noexcept override {
             return detail.c_str();
         }
     };
@@ -137,7 +137,7 @@ namespace tiny {
          * \brief Returns a C-string detailing the error
          * \return A C-string with an explanation of the error
          */
-        [[nodiscard]] const char *what() const override {
+        [[nodiscard]] const char *what() const noexcept override {
             return msg.c_str();
         }
     };
