@@ -10,9 +10,8 @@ TEST(StreamComparator, CompareEqual) {
     auto ws = tiny::WalkableStream(vec);
 
     auto comp = tiny::StreamComparator(ws);
-    std::int32_t seq[] = {1, 2, 3, 4, 5};
 
-    ASSERT_TRUE(comp.compare(seq));
+    ASSERT_TRUE(comp.compare({1, 2, 3, 4, 5}));
 }
 
 TEST(StreamComparator, ComparePeek) {
@@ -20,9 +19,8 @@ TEST(StreamComparator, ComparePeek) {
     auto ws = tiny::WalkableStream(vec);
 
     auto comp = tiny::StreamComparator(ws);
-    std::int32_t seq[] = {1, 2, 3, 4, 5};
 
-    ASSERT_TRUE(comp.comparePeek(seq));
+    ASSERT_TRUE(comp.comparePeek({1, 2, 3, 4, 5}));
     ASSERT_EQ(ws.getIndex(), 0);
 }
 
@@ -31,9 +29,8 @@ TEST(StreamComparator, CompareUnequal) {
     auto ws = tiny::WalkableStream(vec);
 
     auto comp = tiny::StreamComparator(ws);
-    std::int32_t seq[] = {1, 3, 2, 4, 5};
 
-    ASSERT_FALSE(comp.compare(seq));
+    ASSERT_FALSE(comp.compare({1, 3, 2, 4, 5}));
 }
 
 TEST(StreamComparator, CompareDiferentLengths) {
@@ -41,9 +38,8 @@ TEST(StreamComparator, CompareDiferentLengths) {
     auto ws = tiny::WalkableStream(vec);
 
     auto comp = tiny::StreamComparator(ws);
-    std::int32_t seq[] = {1};
 
-    ASSERT_TRUE(comp.compare(seq));
+    ASSERT_TRUE(comp.compare({1}));
 }
 
 TEST(StreamComparator, CompareNot0Index) {
@@ -53,9 +49,8 @@ TEST(StreamComparator, CompareNot0Index) {
     ws.skip();
 
     auto comp = tiny::StreamComparator(ws);
-    std::int32_t seq[] = {1};
 
-    ASSERT_FALSE(comp.compare(seq));
+    ASSERT_FALSE(comp.compare({1}));
 }
 
 TEST(StreamComparator, Match) {

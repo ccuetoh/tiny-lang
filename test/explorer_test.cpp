@@ -9,7 +9,7 @@ const auto sandboxPath = std::filesystem::current_path() / "sandbox";
 const auto sandboxInnerPath = sandboxPath / "inner";
 
 TEST(Explorer, SandboxSetup) {
-    // Setup the sandbox
+    // Set up the sandbox
     std::filesystem::create_directory(sandboxPath);
     std::ofstream file1(sandboxPath / "test1.txt");
     std::ofstream file2(sandboxPath / "test2.txt");
@@ -31,7 +31,7 @@ TEST(Explorer, SearchNoRecursion) {
     explorer.setSearchDepth(0);
 
     std::unordered_set<std::string> got; // Use a set since the order is undefined
-    for (auto &file: explorer.search("test1.txt")) {
+    for (auto const &file: explorer.search("test1.txt")) {
         got.insert(file.path().filename().string());
     }
 
@@ -45,7 +45,7 @@ TEST(Explorer, SearchNotFound) {
     explorer.setSearchDepth(0);
 
     std::unordered_set<std::string> got; // Use a set since the order is undefined
-    for (auto &file: explorer.search("does_not_exist.txt")) {
+    for (auto const &file: explorer.search("does_not_exist.txt")) {
         got.insert(file.path().filename().string());
     }
 
@@ -59,7 +59,7 @@ TEST(Explorer, SearchNoRecursionWildcard) {
     explorer.setSearchDepth(0);
 
     std::unordered_set<std::string> got; // Use a set since the order is undefined
-    for (auto &file: explorer.search("*.txt")) {
+    for (auto const &file: explorer.search("*.txt")) {
         got.insert(file.path().filename().string());
     }
 
@@ -73,7 +73,7 @@ TEST(Explorer, RecursiveSearch) {
     explorer.setSearchDepth(1);
 
     std::unordered_set<std::string> got; // Use a set since the order is undefined
-    for (auto &file: explorer.search("test1_inner.txt")) {
+    for (auto const &file: explorer.search("test1_inner.txt")) {
         got.insert(file.path().filename().string());
     }
 
@@ -87,7 +87,7 @@ TEST(Explorer, RecursiveSearchWildcard) {
     explorer.setSearchDepth(1);
 
     std::unordered_set<std::string> got; // Use a set since the order is undefined
-    for (auto &file: explorer.search("*.txt")) {
+    for (auto const &file: explorer.search("*.txt")) {
         got.insert(file.path().filename().string());
     }
 
@@ -101,7 +101,7 @@ TEST(Explorer, RecursiveSearchMany) {
     explorer.setSearchDepth(1);
 
     std::unordered_set<std::string> got; // Use a set since the order is undefined
-    for (auto &file: explorer.searchMany(std::vector<std::string>{"test1.txt", "test1_inner.txt"})) {
+    for (auto const &file: explorer.searchMany(std::vector<std::string>{"test1.txt", "test1_inner.txt"})) {
         got.insert(file.path().filename().string());
     }
 
@@ -115,7 +115,7 @@ TEST(Explorer, SearchSpacedFilename) {
     explorer.setSearchDepth(0);
 
     std::unordered_set<std::string> got; // Use a set since the order is undefined
-    for (auto &file: explorer.search("te st6.tst")) {
+    for (auto const &file: explorer.search("te st6.tst")) {
         got.insert(file.path().filename().string());
     }
 
@@ -130,7 +130,7 @@ TEST(Explorer, SearchNonASCIIFilename) {
     explorer.setSearchDepth(0);
 
     std::unordered_set<std::string> got; // Use a set since the order is undefined
-    for (auto &file: explorer.search("teñst7.tst")) {
+    for (auto const &file: explorer.search("teñst7.tst")) {
         got.insert(file.path().filename().string());
     }
 

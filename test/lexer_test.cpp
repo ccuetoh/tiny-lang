@@ -43,7 +43,7 @@ std::map<std::string, tiny::Lexeme> tokenRand{
         {"/**/",          tiny::Lexeme(tiny::Token::MultilineComment, "")},
 };
 
-tiny::Lexeme randomID() {
+tiny::Lexeme randomId() {
     std::string id;
     do {
         std::shuffle(idRandChars.begin(), idRandChars.end(), randomGen);
@@ -60,7 +60,7 @@ tiny::Lexeme randomID() {
 std::pair<std::string, tiny::Lexeme> randomLexeme() {
     std::uniform_int_distribution<std::int32_t> zeroToOne(0, 1);
     if (zeroToOne(randomGen) < .333) { // 1/3 chance
-        auto id = randomID();
+        auto id = randomId();
         return {id.value, id};
     }
 
@@ -119,7 +119,7 @@ TEST(Lexer, Keywords) {
         };
 
         ASSERT_EQ(lexemes, expect);
-    } catch (tiny::LexError &e) {
+    } catch (tiny::LexError const &e) {
         std::cout << e.what() << std::endl;
         FAIL();
     }
@@ -410,7 +410,7 @@ TEST(Lexer, Unicode) {
 
         ASSERT_EQ(lexemes, expect);
     }
-    catch (std::exception &e) {
+    catch (std::exception const &e) {
         std::cout << e.what() << std::endl;
         FAIL();
     }
@@ -720,7 +720,7 @@ TEST(Lexer, Benchmark) {
     std::vector<tiny::Lexeme> lexemes;
     try {
         lexemes = lexer.lexAll();
-    } catch (std::exception &e) {
+    } catch (std::exception const &e) {
         std::cout << e.what() << std::endl;
         FAIL();
     }
