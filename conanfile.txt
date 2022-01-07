@@ -1,6 +1,9 @@
 [requires]
 utfcpp/3.2.1
 nlohmann_json/3.9.1
+pybind11/2.8.1
 
 [generators]
 cmake
+cmake_paths
+cmake_find_package

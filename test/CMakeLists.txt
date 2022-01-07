@@ -45,9 +45,8 @@ include(${CMAKE_BINARY_DIR}/conan_paths.cmake)
 
 find_package(utf8cpp REQUIRED)
 find_package(nlohmann_json REQUIRED)
-find_package(pybind11 REQUIRED)
 
-set(CONAN_PKGS utf8cpp::utf8cpp nlohmann_json::nlohmann_json pybind11::pybind11)
+set(CONAN_PKGS utf8cpp::utf8cpp nlohmann_json::nlohmann_json)
 
 add_executable(tests ${SOURCES} ${TESTS})
 target_link_libraries(tests gtest gtest_main ${CONAN_PKGS})
