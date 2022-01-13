@@ -15,15 +15,14 @@ pipeline {
         stage('Run tests') {
             steps {
                 dir("build") {
-                    sh "./tests --gtest_output=xml:${env.WORKSPACE}/test_results.xml"
+                    sh "./tests --gtest_output=xml:../test_results.xml"
                 }
             }
         }
 
         stage('Build release') {
+            when { branch 'master' }
             steps {
-                when { branch 'master' }
-
                 dir("build") {
                     sh "rm -rf build"
                     sh "cmake . -S ${env.WORKSPACE} -B build -DCMAKE_BUILD_TYPE=Release"
@@ -39,7 +38,7 @@ pipeline {
         always {
             xunit(
                 thresholds: [ skipped(failureThreshold: '0'), failed(failureThreshold: '0') ],
-                tools: [ GoogleTest(pattern: '${env.WORKSPACE}/test_results.xml') ])
+                tools: [ GoogleTest(pattern: 'test_results.xml') ])
         }
         success {
             discordSend(
