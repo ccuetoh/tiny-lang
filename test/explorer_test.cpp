@@ -5,29 +5,31 @@
 #include <fstream>
 #include <unordered_set>
 
-const auto sandboxPath = std::filesystem::current_path() / "sandbox";
-const auto sandboxInnerPath = sandboxPath / "inner";
+const auto explorerSandboxPath = std::filesystem::current_path() / "sandbox"/ "explorer";
+const auto explorerInnerPath = explorerSandboxPath / "inner";
 
 TEST(Explorer, SandboxSetup) {
     // Set up the sandbox
-    std::filesystem::create_directory(sandboxPath);
-    std::ofstream file1(sandboxPath / "test1.txt");
-    std::ofstream file2(sandboxPath / "test2.txt");
-    std::ofstream file3(sandboxPath / "test3.txt");
-    std::ofstream file4(sandboxPath / "test4.tst");
-    std::ofstream file5(sandboxPath / "test5.tst");
-    std::ofstream file6(sandboxPath / "te st6.tst"); // Spaced filename
-    std::ofstream file7(sandboxPath / "teñst7.tst"); // Non-ASCII filename
+    std::filesystem::create_directory(std::filesystem::current_path() / "sandbox");
+    std::filesystem::create_directory(explorerSandboxPath);
 
-    std::filesystem::create_directory(sandboxInnerPath);
-    std::ofstream file8(sandboxInnerPath / "test1_inner.txt");
-    std::ofstream file9(sandboxInnerPath / "test2_inner.txt");
+    std::ofstream file1(explorerSandboxPath / "test1.txt");
+    std::ofstream file2(explorerSandboxPath / "test2.txt");
+    std::ofstream file3(explorerSandboxPath / "test3.txt");
+    std::ofstream file4(explorerSandboxPath / "test4.tst");
+    std::ofstream file5(explorerSandboxPath / "test5.tst");
+    std::ofstream file6(explorerSandboxPath / "te st6.tst"); // Spaced filename
+    std::ofstream file7(explorerSandboxPath / "teñst7.tst"); // Non-ASCII filename
 
-    std::cout << "File Explorer Sandbox path is: " << sandboxPath << std::endl;
+    std::filesystem::create_directory(explorerInnerPath);
+    std::ofstream file8(explorerInnerPath / "test1_inner.txt");
+    std::ofstream file9(explorerInnerPath / "test2_inner.txt");
+
+    std::cout << "File Explorer Sandbox path is: " << explorerSandboxPath << std::endl;
 }
 
 TEST(Explorer, SearchNoRecursion) {
-    tiny::Explorer explorer(sandboxPath);
+    tiny::Explorer explorer(explorerSandboxPath);
     explorer.setSearchDepth(0);
 
     std::unordered_set<std::string> got; // Use a set since the order is undefined
@@ -41,7 +43,7 @@ TEST(Explorer, SearchNoRecursion) {
 }
 
 TEST(Explorer, SearchNotFound) {
-    tiny::Explorer explorer(sandboxPath);
+    tiny::Explorer explorer(explorerSandboxPath);
     explorer.setSearchDepth(0);
 
     std::unordered_set<std::string> got; // Use a set since the order is undefined
@@ -55,7 +57,7 @@ TEST(Explorer, SearchNotFound) {
 }
 
 TEST(Explorer, SearchNoRecursionWildcard) {
-    tiny::Explorer explorer(sandboxPath);
+    tiny::Explorer explorer(explorerSandboxPath);
     explorer.setSearchDepth(0);
 
     std::unordered_set<std::string> got; // Use a set since the order is undefined
@@ -69,7 +71,7 @@ TEST(Explorer, SearchNoRecursionWildcard) {
 }
 
 TEST(Explorer, RecursiveSearch) {
-    tiny::Explorer explorer(sandboxPath);
+    tiny::Explorer explorer(explorerSandboxPath);
     explorer.setSearchDepth(1);
 
     std::unordered_set<std::string> got; // Use a set since the order is undefined
@@ -83,7 +85,7 @@ TEST(Explorer, RecursiveSearch) {
 }
 
 TEST(Explorer, RecursiveSearchWildcard) {
-    tiny::Explorer explorer(sandboxPath);
+    tiny::Explorer explorer(explorerSandboxPath);
     explorer.setSearchDepth(1);
 
     std::unordered_set<std::string> got; // Use a set since the order is undefined
@@ -97,11 +99,11 @@ TEST(Explorer, RecursiveSearchWildcard) {
 }
 
 TEST(Explorer, RecursiveSearchMany) {
-    tiny::Explorer explorer(sandboxPath);
+    tiny::Explorer explorer(explorerSandboxPath);
     explorer.setSearchDepth(1);
 
     std::unordered_set<std::string> got; // Use a set since the order is undefined
-    for (auto const &file: explorer.searchMany(std::vector<std::string>{"test1.txt", "test1_inner.txt"})) {
+    for (auto const &file: explorer.search(std::vector<std::string>{"test1.txt", "test1_inner.txt"})) {
         got.insert(file.path().filename().string());
     }
 
@@ -111,7 +113,7 @@ TEST(Explorer, RecursiveSearchMany) {
 }
 
 TEST(Explorer, SearchSpacedFilename) {
-    tiny::Explorer explorer(sandboxPath);
+    tiny::Explorer explorer(explorerSandboxPath);
     explorer.setSearchDepth(0);
 
     std::unordered_set<std::string> got; // Use a set since the order is undefined
@@ -126,7 +128,8 @@ TEST(Explorer, SearchSpacedFilename) {
 
 
 TEST(Explorer, SearchNonASCIIFilename) {
-    tiny::Explorer explorer(sandboxPath);
+    std::filesystem::current_path() / "sandbox";
+    tiny::Explorer explorer(explorerSandboxPath);
     explorer.setSearchDepth(0);
 
     std::unordered_set<std::string> got; // Use a set since the order is undefined
@@ -140,5 +143,5 @@ TEST(Explorer, SearchNonASCIIFilename) {
 }
 
 TEST(Explorer, Cleanup) {
-    std::filesystem::remove_all(sandboxPath);
+    std::filesystem::remove_all(explorerSandboxPath);
 }
