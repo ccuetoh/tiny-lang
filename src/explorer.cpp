@@ -11,11 +11,11 @@ void tiny::Explorer::setSearchDepth(std::int32_t depth) {
 }
 
 std::vector<std::filesystem::directory_entry> tiny::Explorer::search(const std::string &term) const {
-    return searchMany({term});
+    return search(std::vector<std::string>{term});
 }
 
-std::vector<std::filesystem::directory_entry> tiny::Explorer::searchMany(const std::vector<std::string> &terms,
-                                                                         const std::vector<std::string> &folders) const {
+std::vector<std::filesystem::directory_entry> tiny::Explorer::search(const std::vector<std::string> &terms,
+                                                                     const std::vector<std::string> &folders) const {
     // Prepare filetype wildcards (ex. *.txt -> txt)
     std::vector<std::string> extensions;
     for (const auto &term: terms) {

@@ -147,6 +147,11 @@ namespace tiny {
         using FileError::FileError; // Inherit the constructor
     };
 
+    //! Gets thrown when the more than one metafiles are found
+    struct TooManyMetaFiles : tiny::FileError {
+        using FileError::FileError; // Inherit the constructor
+    };
+
     //! Gets thrown when no Tiny source files are found
     struct SourcesNotFoundError : tiny::FileError {
         using FileError::FileError; // Inherit the constructor

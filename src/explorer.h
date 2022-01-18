@@ -21,7 +21,7 @@ namespace tiny {
          * Creates an Explorer instance with the base directory set to the given path. If the given directory does not
          * exist, a std::runtime_exception will get thrown on creation.
          */
-        explicit Explorer(std::string_view path) : path(path) {};
+        explicit Explorer(std::string_view path, std::int32_t depth = 1) : path(path), searchDepth(depth)  {};
 
         /*!
          * \brief Creates an Explorer instance with the base directory set to the given path.
@@ -30,7 +30,7 @@ namespace tiny {
          * Creates an Explorer instance with the base directory set to the given path. If the given directory does not
          * exist, a std::runtime_exception will get thrown on creation.
          */
-        explicit Explorer(std::filesystem::path path) : path(std::move(path)) {};
+        explicit Explorer(std::filesystem::path path, std::int32_t depth = 1) : path(std::move(path)), searchDepth(depth) {};
 
         /*!
          * \brief Iterates over the set directory and searches for a matching filename
@@ -50,7 +50,7 @@ namespace tiny {
          * \return A vector with the results of the search. Empty vector if no matches where found.
          */
         [[nodiscard]] std::vector<std::filesystem::directory_entry>
-        searchMany(const std::vector<std::string> &terms, const std::vector<std::string> &folders = {}) const;
+        search(const std::vector<std::string> &terms, const std::vector<std::string> &folders = {}) const;
 
         /*!
          * \brief Returns the current search depth.
