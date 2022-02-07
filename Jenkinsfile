@@ -25,7 +25,7 @@ pipeline {
             steps {
                 dir("build") {
                     sh "rm -rf build"
-                    sh "cmake . -S ${env.WORKSPACE} -B build -DCMAKE_BUILD_TYPE=Release"
+                    sh "cmake . -S ${env.WORKSPACE} -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS="-O3""
                     sh "cmake --build build --config Release --clean-first"
 
                     archiveArtifacts(artifacts: "build/tiny", fingerprint: true, onlyIfSuccessful: true)
