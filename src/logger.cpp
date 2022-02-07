@@ -30,16 +30,16 @@ void tiny::Logger::log(const tiny::LogMsg &msg) {
     GetConsoleScreenBufferInfo(console, &bufferInfo);
     WORD consoleAttr = bufferInfo.wAttributes;
 
-    std::cout << "[";
+    stream << "[";
 
     SetConsoleTextAttribute(console, tiny::LogMsg::levelColour(msg.level));
-    std::cout << lv;
+    stream << lv;
 
     SetConsoleTextAttribute(console, consoleAttr); // Reset the console
-    std::cout << "] " + msg.content + "\n";
+    stream << "] " + msg.content + "\n";
 #else
-    std::cout << "[" << "\u001b[" << tiny::LogMsg::levelColour(msg.level) << ";1m" << lv;
-    std::cout << "\u001b[0m] " + msg.content + "\n";
+    stream << "[" << "\u001b[" << tiny::LogMsg::levelColour(msg.level) << ";1m" << lv;
+    stream << "\u001b[0m] " + msg.content + "\n";
 #endif
 }
 

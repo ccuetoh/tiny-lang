@@ -7,7 +7,7 @@
 
 #if defined(_WIN32)
 
-#include <windows.h>
+#include <Windows.h>
 
 #endif
 
@@ -39,7 +39,7 @@ namespace tiny {
          *
          * Fetches the Logger's singleton instance. Implements Meyers' singleton pattern.
          */
-        static Logger &getInstance() {
+        static Logger &get() {
             static Logger instance;
             return instance;
         }
@@ -105,6 +105,9 @@ namespace tiny {
         Logger(Logger const &);              // Meyers' singleton pattern. Don't Implement
         void operator=(Logger const &);      // Ibidem
 
+        //! Stream on which to log
+        std::ostream& stream = std::cout;
+
         //! Lock over the logger
         std::mutex mutex;
 
@@ -119,7 +122,7 @@ namespace tiny {
         * \param level The logging level
         * \param msg Content of the message
         */
-        LogMsg(tiny::LogLv level, std::string msg) : level(level), content(std::move(msg)) {}
+        LogMsg(tiny::LogLv level, std::string msg) : content(std::move(msg)), level(level) {}
 
         //! Content of the log
         std::string content;
@@ -144,6 +147,14 @@ namespace tiny {
         */
         [[nodiscard]] static std::int32_t levelColour(LogLv lv);
     };
+
+#if !defined(TINY_DISABLE_COMPACT_LOGGING)
+    inline auto debug(const std::string& msg) { tiny::Logger::get().debug(msg); }
+    inline auto info(const std::string& msg) { tiny::Logger::get().info(msg); }
+    inline auto warn(const std::string& msg) { tiny::Logger::get().warning(msg); }
+    inline auto error(const std::string& msg) { tiny::Logger::get().error(msg); }
+    inline auto fatal(const std::string& msg) { tiny::Logger::get().fatal(msg); }
+#endif
 }
 
 

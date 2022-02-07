@@ -128,7 +128,6 @@ TEST(Explorer, SearchSpacedFilename) {
 
 
 TEST(Explorer, SearchNonASCIIFilename) {
-    std::filesystem::current_path() / "sandbox";
     tiny::Explorer explorer(explorerSandboxPath);
     explorer.setSearchDepth(0);
 
