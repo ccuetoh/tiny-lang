@@ -60,6 +60,7 @@ tiny::CompilationResult tiny::Compiler::compile() {
         tiny::WalkableStream<std::uint32_t> charStream(filestream);
 
         tiny::Lexer lexer(charStream);
+        lexer.setMetadataFilename(f.path.filename().string());
         std::vector<tiny::Lexeme> lexemes;
 
         tiny::debug("Lexing..");
@@ -73,10 +74,8 @@ tiny::CompilationResult tiny::Compiler::compile() {
         try {
             lexemes = lexer.lexAll();
         } catch (tiny::LexError &e) {
-            tiny::ErrorBuilder builder(e, charStream);
-
             tiny::error(e.what());
-            builder.log();
+            e.log(charStream);
             tiny::fatal("Invalid program");
 
             return {tiny::CompilationStatus::Error, {tiny::CompilationStep::Lexer, e.what()}};
@@ -100,10 +99,8 @@ tiny::CompilationResult tiny::Compiler::compile() {
         try {
             astFile = parser.file(f.path.filename().string());
         } catch (tiny::ParseError &e) {
-            tiny::ErrorBuilder builder(e, charStream);
-
             tiny::error(e.what());
-            builder.log();
+            e.log(charStream);
             tiny::fatal("Invalid program");
 
             return {tiny::CompilationStatus::Error, {tiny::CompilationStep::Parser, e.what()}};

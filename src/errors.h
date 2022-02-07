@@ -32,26 +32,12 @@ namespace tiny {
         [[nodiscard]] const char *what() const noexcept override {
             return msg.c_str();
         }
-    };
-
-    //! The ErrorBuilder applies a stream over the exception's metadata to generate a formatted exception message for logging
-    class ErrorBuilder {
-        //! The exception thrown
-        tiny::CompilerError &exception;
-
-        //! The stream representation of the file that threw the error
-        tiny::WalkableStream<std::uint32_t> &stream;
-
-    public:
-        //! Constructor over the exception and stream
-        explicit ErrorBuilder(tiny::CompilerError &e, tiny::WalkableStream<std::uint32_t> &s) : exception(e),
-                                                                                                stream(s) {};
 
         /*!
-         * \brief Logs the formatted exception to the provider logger with level Error
-         * \param l Logger in which to log the error
+         * \brief Uses the error metadata to build a context around a stream and logs it to the Logger
+         * \param s The stream over which the error was found
          */
-        void log() const;
+        void log(tiny::WalkableStream<std::uint32_t> &s) const;
     };
 
     //! Gets thrown by the lexer when a program can't be tokenized.

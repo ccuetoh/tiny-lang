@@ -2,11 +2,11 @@
 
 #include <algorithm>
 
-void tiny::ErrorBuilder::log() const {
-    auto [line, col] = exception.meta.getPosition(stream);
-    auto [context, pos] = exception.meta.getContext(stream);
+void tiny::CompilerError::log(tiny::WalkableStream<std::uint32_t> &s) const {
+    auto [line, col] = meta.getPosition(s);
+    auto [context, pos] = meta.getContext(s);
 
-    tiny::error("In file \"" + exception.meta.filename + "\" in line " + std::to_string(line) +
+    tiny::error("In file \"" + meta.filename + "\" in line " + std::to_string(line) +
             ", column " + std::to_string(col) + ": ");
 
     tiny::error("\t" + context);
