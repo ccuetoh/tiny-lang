@@ -51,7 +51,7 @@ namespace tiny {
          * \brief Logs the formatted exception to the provider logger with level Error
          * \param l Logger in which to log the error
          */
-        void log(tiny::Logger &l) const;
+        void log() const;
     };
 
     //! Gets thrown by the lexer when a program can't be tokenized.

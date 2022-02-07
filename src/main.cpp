@@ -9,15 +9,13 @@
  */
 
 int main(int argc, char **argv) {
-    tiny::Logger *logger = &tiny::Logger::getInstance();
-    logger->setLevel(tiny::LogLv::Debug);
+    tiny::Logger::get().setLevel(tiny::LogLv::Debug);
 
     try {
         std::locale::global(std::locale("en_US.UTF8"));
     } catch (std::runtime_error const &) {
-        logger->warning(
-                "Unable to use 'en_US.UTF8' locale. Using the system's default ('" + std::locale().name() + "').");
-        logger->warning("Non-ASCII characters might be unrecognized.");
+        tiny::warn("Unable to use 'en_US.UTF8' locale. Using the system's default ('" + std::locale().name() + "').");
+        tiny::warn("Non-ASCII characters might be unrecognized.");
     }
 
     if (argc == 2 && (strcmp(argv[1], "--version") == 0 || strcmp(argv[1], "version") == 0)) {
@@ -27,6 +25,5 @@ int main(int argc, char **argv) {
     }
 
     tiny::Compiler compiler;
-    compiler.setLogger(logger);
     compiler.compile();
 }

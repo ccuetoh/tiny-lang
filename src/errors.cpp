@@ -2,13 +2,13 @@
 
 #include <algorithm>
 
-void tiny::ErrorBuilder::log(tiny::Logger &l) const {
-    auto pos = exception.meta.getPosition(stream);
-    auto context = exception.meta.getContext(stream);
+void tiny::ErrorBuilder::log() const {
+    auto [line, col] = exception.meta.getPosition(stream);
+    auto [context, pos] = exception.meta.getContext(stream);
 
-    l.error("In file \"" + exception.meta.filename + "\" in line " + std::to_string(pos.first) +
-            ", column " + std::to_string(pos.second) + ": ");
+    tiny::error("In file \"" + exception.meta.filename + "\" in line " + std::to_string(line) +
+            ", column " + std::to_string(col) + ": ");
 
-    l.error("\t" + context.first);
-    l.error("\t" + std::string((std::max)(context.second - 2, 0), ' ') + std::string(3, '^'));
+    tiny::error("\t" + context);
+    tiny::error("\t" + std::string((std::max)(pos - 2, 0), ' ') + std::string(3, '^'));
 }

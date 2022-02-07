@@ -54,9 +54,6 @@ namespace tiny {
          */
         [[nodiscard]] static std::string getSignature();
 
-        //! Sets the logger for the compilation process
-        void setLogger(tiny::Logger *logger);
-
         /*!
          * \brief Starts the compilation process
          * \return A compilation result struct, which indicates the result of the compilation
@@ -71,16 +68,10 @@ namespace tiny {
         tiny::CompilationResult compile();
 
     private:
-        //! The logger for the compilation. If null logging will be disabled
-        tiny::Logger *logger = nullptr;
-
         //! The compilation Pipeline to support scripting
         tiny::Pipeline pl = tiny::Pipeline();
         //! The file selector to choose which files should be targeted by the compiler
         tiny::FileSelector fileSelector{};
-
-        //! A wrapper for the logger that checks whether one is set, and logs only if its the case
-        void log(tiny::LogLv lv, const std::string &msg);
     };
 }
 

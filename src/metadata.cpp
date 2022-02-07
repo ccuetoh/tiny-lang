@@ -32,7 +32,7 @@ tiny::Metadata::getContext(tiny::WalkableStream<std::uint32_t> &s, std::int32_t 
     // Backup until a newline is found or the range is exceeded
     for (; errPos < range / 2; errPos++) {
         if (s.peek() == '\n') {
-            s.skip(); // StageStep over the newline
+            s.skip(); // Step over the newline
             break;
         }
 
@@ -59,7 +59,7 @@ tiny::Metadata::getContext(tiny::WalkableStream<std::uint32_t> &s, std::int32_t 
 
 
     auto ctxStr = tiny::UnicodeParser::toString(context);
-    int prevLength = std::int32_t(ctxStr.length());
+    auto prevLength = std::int32_t(ctxStr.length());
 
     tiny::ltrim(ctxStr);
 
