@@ -34,7 +34,7 @@ namespace tiny {
          * \param s Stream in which the position is calculated
          * \return A [line, column] index pair
          */
-        [[nodiscard]] std::pair<std::uint64_t, std::uint64_t> getPosition(tiny::WalkableStream<std::uint32_t> &s) const;
+        [[nodiscard]] std::pair<std::uint64_t, std::uint64_t> getPosition(tiny::Stream<std::uint32_t> &s) const;
 
         /*!
          * \brief Returns the context around the error and the position of the error in the context
@@ -47,7 +47,7 @@ namespace tiny {
          * error position. So a maximum of 2/range - len(error) characters will be to either side of the error string.
          */
         [[nodiscard]] std::pair<std::string, std::int32_t>
-        getContext(tiny::WalkableStream<std::uint32_t> &s, std::int32_t range = 100) const;
+        getContext(tiny::Stream<std::uint32_t> &s, std::int32_t range = 100) const;
 
         /*!
          * \brief Returns the length between the start and end positions

@@ -7,7 +7,7 @@
 
 TEST(StreamComparator, CompareEqual) {
     std::vector<std::int32_t> vec = {1, 2, 3, 4, 5};
-    auto ws = tiny::WalkableStream(vec);
+    auto ws = tiny::Stream(vec);
 
     auto comp = tiny::StreamComparator(ws);
 
@@ -16,7 +16,7 @@ TEST(StreamComparator, CompareEqual) {
 
 TEST(StreamComparator, ComparePeek) {
     std::vector<std::int32_t> vec = {1, 2, 3, 4, 5};
-    auto ws = tiny::WalkableStream(vec);
+    auto ws = tiny::Stream(vec);
 
     auto comp = tiny::StreamComparator(ws);
 
@@ -26,7 +26,7 @@ TEST(StreamComparator, ComparePeek) {
 
 TEST(StreamComparator, CompareUnequal) {
     std::vector<std::int32_t> vec = {1, 2, 3, 4, 5};
-    auto ws = tiny::WalkableStream(vec);
+    auto ws = tiny::Stream(vec);
 
     auto comp = tiny::StreamComparator(ws);
 
@@ -35,7 +35,7 @@ TEST(StreamComparator, CompareUnequal) {
 
 TEST(StreamComparator, CompareDiferentLengths) {
     std::vector<std::int32_t> vec = {1, 2, 3, 4, 5};
-    auto ws = tiny::WalkableStream(vec);
+    auto ws = tiny::Stream(vec);
 
     auto comp = tiny::StreamComparator(ws);
 
@@ -44,7 +44,7 @@ TEST(StreamComparator, CompareDiferentLengths) {
 
 TEST(StreamComparator, CompareNot0Index) {
     std::vector<std::int32_t> vec = {1, 2, 3, 4, 5};
-    auto ws = tiny::WalkableStream(vec);
+    auto ws = tiny::Stream(vec);
 
     ws.skip();
 
@@ -56,7 +56,7 @@ TEST(StreamComparator, CompareNot0Index) {
 TEST(StreamComparator, Match) {
     std::vector<std::int32_t> vec = {1, 2, 3, 4, 5};
 
-    auto ws = tiny::WalkableStream(vec);
+    auto ws = tiny::Stream(vec);
     auto comp = tiny::StreamComparator(ws);
 
     std::map<std::vector<std::int32_t>, std::int32_t> seq{
@@ -72,7 +72,7 @@ TEST(StreamComparator, Match) {
 TEST(StreamComparator, NoMatch) {
     std::vector<std::int32_t> vec = {1, 2, 3, 4, 5};
 
-    auto ws = tiny::WalkableStream(vec);
+    auto ws = tiny::Stream(vec);
     auto comp = tiny::StreamComparator(ws);
 
     std::map<std::vector<std::int32_t>, std::int32_t> seq{
@@ -88,7 +88,7 @@ TEST(StreamComparator, NoMatch) {
 TEST(StreamComparator, NoMatchWithDefault) {
     std::vector<std::int32_t> vec = {1, 2, 3, 4, 5};
 
-    auto ws = tiny::WalkableStream(vec);
+    auto ws = tiny::Stream(vec);
     auto comp = tiny::StreamComparator(ws);
 
     std::map<std::vector<std::int32_t>, std::int32_t> seq{
@@ -104,7 +104,7 @@ TEST(StreamComparator, NoMatchWithDefault) {
 TEST(StreamComparator, MatchPeek) {
     std::vector<std::int32_t> vec = {1, 2, 3, 4, 5};
 
-    auto ws = tiny::WalkableStream(vec);
+    auto ws = tiny::Stream(vec);
     auto comp = tiny::StreamComparator(ws);
 
     std::map<std::vector<std::int32_t>, std::int32_t> seq{

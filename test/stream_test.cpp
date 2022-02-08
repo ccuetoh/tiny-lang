@@ -4,7 +4,7 @@
 
 TEST(WalkableStream, StreamOperations) {
     std::vector<std::int32_t> vec = {1, 2, 3, 4, 5};
-    auto ws = tiny::WalkableStream(vec);
+    auto ws = tiny::Stream(vec);
 
     ASSERT_EQ(ws.get(), 1);
     ASSERT_EQ(ws.peek(), 2);
@@ -34,7 +34,7 @@ TEST(WalkableStream, StreamLargeVector) {
         vec.push_back(i);
     }
 
-    auto ws = tiny::WalkableStream(vec);
+    auto ws = tiny::Stream(vec);
 
     for (long i = 0; i < 9999999; i++) {
         ASSERT_EQ(ws.get(), i);

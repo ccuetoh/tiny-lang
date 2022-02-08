@@ -15,7 +15,7 @@ TEST(Parser, Module) {
             "}\n";
 
     tiny::Lexer lexer(data);
-    tiny::WalkableStream<tiny::Lexeme> lexemes(lexer.lexAll());
+    tiny::Stream<tiny::Lexeme> lexemes(lexer.lexAll());
 
     tiny::Parser p(lexemes);
 

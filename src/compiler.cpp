@@ -57,7 +57,7 @@ tiny::CompilationResult tiny::Compiler::compile() {
         tiny::info("Compiling " + f.path.filename().string());
 
         std::ifstream filestream(f.path);
-        tiny::WalkableStream<std::uint32_t> charStream(filestream);
+        tiny::Stream<std::uint32_t> charStream(filestream);
 
         tiny::Lexer lexer(charStream);
         lexer.setMetadataFilename(f.path.filename().string());
@@ -84,7 +84,7 @@ tiny::CompilationResult tiny::Compiler::compile() {
         tiny::debug("Running lex pipe with length " + std::to_string(pl.getPipeLength(tiny::CompilationStep::Lexer)));
         lexemes = pl.runLexPipe(lexemes);
 
-        tiny::WalkableStream<tiny::Lexeme> lexemeStream(lexemes, tiny::Lexeme(tiny::Token::None));
+        tiny::Stream<tiny::Lexeme> lexemeStream(lexemes, tiny::Lexeme(tiny::Token::None));
         tiny::Parser parser(lexemeStream);
 
         tiny::debug("Parsing..");

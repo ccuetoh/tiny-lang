@@ -353,10 +353,10 @@ namespace tiny {
         explicit Lexer() = default;
 
         /*!
-         * \brief Builds the Lexer stream from a WalkableStream<char>
+         * \brief Builds the Lexer stream from a Stream<char>
          * \param stream The character stream to feed into the Lexer
          */
-        explicit Lexer(tiny::WalkableStream<std::uint32_t> stream) : s(std::move(stream)) {};
+        explicit Lexer(tiny::Stream<std::uint32_t> stream) : s(std::move(stream)) {};
 
         /*!
          * \brief Builds the lexer stream from an std::istream
@@ -450,7 +450,7 @@ namespace tiny {
         static const char StreamTerminator = '\0';
 
         //! The source-code stream
-        tiny::WalkableStream<std::uint32_t> s{};
+        tiny::Stream<std::uint32_t> s{};
 
         /*!
          * \brief Lexes an identifier from the stream

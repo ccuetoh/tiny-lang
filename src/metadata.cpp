@@ -1,7 +1,7 @@
 #include "metadata.h"
 #include "stringutil.h"
 
-std::pair<std::uint64_t, std::uint64_t> tiny::Metadata::getPosition(tiny::WalkableStream<std::uint32_t> &s) const {
+std::pair<std::uint64_t, std::uint64_t> tiny::Metadata::getPosition(tiny::Stream<std::uint32_t> &s) const {
     std::uint64_t line = 1;
     std::uint64_t col = 1;
 
@@ -20,7 +20,7 @@ std::pair<std::uint64_t, std::uint64_t> tiny::Metadata::getPosition(tiny::Walkab
 }
 
 std::pair<std::string, std::int32_t>
-tiny::Metadata::getContext(tiny::WalkableStream<std::uint32_t> &s, std::int32_t range) const {
+tiny::Metadata::getContext(tiny::Stream<std::uint32_t> &s, std::int32_t range) const {
     unsigned long prevState = s.getIndex(); // Save the index to restore it latter
 
     // Start from the character that generated the error

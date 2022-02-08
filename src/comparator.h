@@ -7,16 +7,16 @@
 #include "stream.h"
 
 namespace tiny {
-    //! The underlying type of the WalkableStream and the sequences.
+    //! The underlying type of the Stream and the sequences.
     template<typename T>
-    //! A StreamComparator helps to compare a WalkableStream to an array of values.
+    //! A StreamComparator helps to compare a Stream to an array of values.
     class StreamComparator {
     public:
         /*!
-         * \brief Create a comparator from a WalkableStream
+         * \brief Create a comparator from a Stream
          * \param stream Stream to compare to
          */
-        explicit StreamComparator(tiny::WalkableStream<T> &stream) : s(stream) {};
+        explicit StreamComparator(tiny::Stream<T> &stream) : s(stream) {};
 
         /*!
          * \brief Compares the sequence with the stream
@@ -171,7 +171,7 @@ namespace tiny {
 
     private:
         //! Stream to compare
-        WalkableStream <T> &s;
+        Stream <T> &s;
     };
 }
 

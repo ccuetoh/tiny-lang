@@ -10,7 +10,7 @@ namespace tiny {
     /*!
      * \brief Parser takes a stream of Lexemes and sequentially resolves them into an AST via recursive decent
      *
-     * Parser takes a stream of Lexemes (as a WalkableStream) and sequentially resolves them into an Abstract
+     * Parser takes a stream of Lexemes (as a Stream) and sequentially resolves them into an Abstract
      * Syntax Tree using the recursive decent method.
      */
     class Parser {
@@ -21,10 +21,10 @@ namespace tiny {
         explicit Parser() = default;
 
         /*!
-         * \brief Constructor from a WalkableStream
-         * \param stream WalkableStream of Lexemes that represent a Tiny file
+         * \brief Constructor from a Stream
+         * \param stream Stream of Lexemes that represent a Tiny file
          */
-        explicit Parser(tiny::WalkableStream<tiny::Lexeme> &stream) : s(stream) {};
+        explicit Parser(tiny::Stream<tiny::Lexeme> &stream) : s(stream) {};
 
         /*!
          * \brief Parses a complete file of source code
@@ -393,8 +393,8 @@ namespace tiny {
                                                        tiny::Token::MultilineComment,
                                                        tiny::Token::NewLine};
 
-        //! The program stream as a WalkableStream of Lexemes
-        tiny::WalkableStream<tiny::Lexeme> s;
+        //! The program stream as a Stream of Lexemes
+        tiny::Stream<tiny::Lexeme> s;
 
     };
 }

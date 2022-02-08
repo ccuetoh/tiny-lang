@@ -37,7 +37,7 @@ namespace tiny {
          * \brief Uses the error metadata to build a context around a stream and logs it to the Logger
          * \param s The stream over which the error was found
          */
-        void log(tiny::WalkableStream<std::uint32_t> &s) const;
+        void log(tiny::Stream<std::uint32_t> &s) const;
     };
 
     //! Gets thrown by the lexer when a program can't be tokenized.

@@ -2,7 +2,7 @@
 
 #include <algorithm>
 
-void tiny::CompilerError::log(tiny::WalkableStream<std::uint32_t> &s) const {
+void tiny::CompilerError::log(tiny::Stream<std::uint32_t> &s) const {
     auto [line, col] = meta.getPosition(s);
     auto [context, pos] = meta.getContext(s);
 
