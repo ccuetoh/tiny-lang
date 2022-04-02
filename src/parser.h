@@ -87,7 +87,7 @@ namespace tiny {
          * \param optional Whether an error should be thrown when no module name is present
          * \return The name of the module
          */
-        [[nodiscard]] std::string moduleStatement(bool optional = false);
+        [[nodiscard]] tiny::UnicodeString moduleStatement(bool optional = false);
 
         /*!
          * \brief Consumes an import statement from the stream

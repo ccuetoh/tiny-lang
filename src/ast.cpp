@@ -30,7 +30,7 @@ nlohmann::json tiny::ASTFile::toJson() const {
     return nlohmann::json{
             {"file", {
                     {"path", filename},
-                    {"module", mod},
+                    {"module", mod.toString()},
                     {"imports", jsonImports},
                     {"statements", jsonStmts}
             }},
@@ -48,8 +48,8 @@ nlohmann::json tiny::ASTNode::toJson() const {
 
     json["children"] = childrenJson;
 
-    auto strVal = tiny::toString(val);
-    if (!strVal.empty()) {
+
+    if (auto strVal = tiny::toString(val); !strVal.empty()) {
         json["value"] = strVal;
     }
 
@@ -230,11 +230,11 @@ nlohmann::json tiny::Parameter::toJson() const {
 
 nlohmann::json tiny::Import::toJson() const {
     nlohmann::json json{
-            {"module", mod},
+            {"module", mod.toString()},
     };
 
-    if (!alias.empty()) {
-        json["alias"] = alias;
+    if (!alias) {
+        json["alias"] = alias.toString();
     }
 
     return json;
@@ -268,13 +268,9 @@ std::string tiny::Parameter::toString() const {
     }
 }
 
-tiny::Value tiny::stringToValue(const std::string &s) {
-    return tiny::Value{tiny::UnicodeParser::fromString(s)};
-}
-
 std::string tiny::toString(tiny::Value val) {
-    if (std::holds_alternative<tiny::UnicodeCodepoints>(val)) {
-        return tiny::UnicodeParser::toString(std::get<tiny::UnicodeCodepoints>(val));
+    if (std::holds_alternative<tiny::UnicodeString>(val)) {
+        return std::get<tiny::UnicodeString>(val).toString();
     }
 
     if (std::holds_alternative<std::int64_t>(val)) {

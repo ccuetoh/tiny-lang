@@ -16,7 +16,7 @@
 std::random_device rd;
 std::mt19937 randomGen(rd());
 
-tiny::UnicodeCodepoints idRandChars = tiny::UnicodeParser::fromString(
+tiny::UnicodeString idRandChars = tiny::UnicodeString(
         "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzáÁäÄçÇúÚüÜéÉëËóÓöÖíÍïÏ_");
 std::map<std::string, tiny::Lexeme> tokenRand{
         {"func",          tiny::Lexeme(tiny::Token::KwFunc)},
@@ -51,7 +51,7 @@ tiny::Lexeme randomId() {
         std::uniform_int_distribution<std::int32_t> uni(1, std::int32_t(idRandChars.size() - 1));
         std::int32_t size = uni(randomGen);
 
-        id = tiny::UnicodeParser::toString(tiny::UnicodeCodepoints(idRandChars.begin(), idRandChars.begin() + size));
+        id = tiny::UnicodeParser::toString(tiny::UnicodeString(idRandChars.begin(), idRandChars.begin() + size));
     } while (isdigit(id[0]));
 
     return tiny::Lexeme(tiny::Token::Id, id);

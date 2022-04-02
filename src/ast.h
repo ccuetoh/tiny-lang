@@ -19,18 +19,11 @@ namespace tiny {
 
     //! Value is a variant that can hold any of a unicode string, an uint64, an int64, a long double or a boolean
     using Value = std::variant<
-            tiny::UnicodeCodepoints, // ID, string or char
+            tiny::UnicodeString, // ID, string or char
             std::int64_t,            // Integer
             std::uint64_t,           // Unsigned integer
             long double,             // Decimal
             bool>;                   // Boolean
-
-    /*!
-     * \brief Transforms a standard string to a Value
-     * \param s UTF-8 encoded std::string to be stored inside the value
-     * \return A Value with the string as the underlying value
-     */
-    [[nodiscard]] tiny::Value stringToValue(const std::string &s);
 
     /*!
      * \brief Transforms a Value into a std::string
@@ -373,19 +366,19 @@ namespace tiny {
          * \brief Creates a standard (non-aliased) import with the name of the module
          * \param modl Name of the module
          */
-        explicit Import(std::string_view modl) : mod(modl) {};
+        explicit Import(tiny::UnicodeString modl) : mod(std::move(modl)) {};
 
         /*!
          * \brief Creates an aliased import over the name of the module
          * \param modl Name of the module
          * \param als Alias of the imported module
          */
-        explicit Import(std::string_view modl, std::string_view als) : mod(modl), alias(als) {};
+        explicit Import(tiny::UnicodeString modl, tiny::UnicodeString als) : mod(std::move(modl)), alias(std::move(als)) {};
 
         //! Name of the module getting imported
-        std::string mod;
+        tiny::UnicodeString mod;
         //! Optional alias for the import
-        std::string alias;
+        tiny::UnicodeString alias;
 
         /*!
          * \brief Serializes the Import as a JSON object
@@ -412,7 +405,7 @@ namespace tiny {
          * \param stmts Vector of the AST roots
          */
         explicit ASTFile(std::string_view fn,
-                         std::string_view modl,
+                         tiny::UnicodeString modl,
                          std::vector<tiny::Import> imprts,
                          tiny::StatementList stmts) :
                 filename(fn),
@@ -423,7 +416,7 @@ namespace tiny {
         //! Path to the original file that created the AST
         std::string filename;
         //! Name of the module which the file is a part of
-        std::string mod;
+        tiny::UnicodeString mod;
         //! Imports called by the code in the file
         std::vector<tiny::Import> imports;
         //! The AST

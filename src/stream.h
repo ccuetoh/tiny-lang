@@ -11,7 +11,7 @@
 
 namespace tiny {
     //! The underlying type of the stream's data
-    template<typename T>
+    template<typename T = std::uint32_t>
     //! A Stream wraps a vector so it can be accessed sequentially and similar to a stream
     class Stream {
     public:
@@ -21,19 +21,23 @@ namespace tiny {
         explicit Stream() = default;
 
         /*!
+         * \brief Default destructor
+         */
+        ~Stream() = default;
+
+        /*!
          * \brief Use a collection for the creation of the stream and provide a terminator value
          * \param col A vector of items to add to the stream
          * \param terminator An optional terminator to return if the stream's length is exceeded
          */
-        explicit Stream(std::vector<T> col, T terminator = T{}) : collection(col), terminator(terminator) {};
+        explicit Stream(std::vector<T> col, T terminator = {}) : collection(col), terminator(terminator) {};
 
         /*!
          * \brief Use a std::stream for the creation of the underlying vector
          * \param stream A stream of UTF-8 encoded characters to add to the Stream
          * \param terminator An optional terminator to return if the stream's length is exceeded
          */
-        explicit Stream(std::istream &stream, T terminator = T{}) : terminator(terminator), collection(
-                tiny::UnicodeParser::fromStream(stream)) {};
+        explicit Stream(std::istream &stream, T terminator = {}) : terminator(terminator), collection(tiny::UnicodeString(stream).data()) {};
 
         /*!
          * \brief Check whether the end of the stream has been reached

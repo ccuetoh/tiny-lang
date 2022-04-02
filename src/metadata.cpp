@@ -26,8 +26,6 @@ tiny::Metadata::getContext(tiny::Stream<std::uint32_t> &s, std::int32_t range) c
     // Start from the character that generated the error
     s.seek(start);
 
-    auto strStream = tiny::UnicodeParser::toString(s.getVector());
-
     std::int32_t errPos = 0; // This will hold the margin between the start of the string and the error char
     // Backup until a newline is found or the range is exceeded
     for (; errPos < range / 2; errPos++) {
@@ -44,21 +42,21 @@ tiny::Metadata::getContext(tiny::Stream<std::uint32_t> &s, std::int32_t range) c
     }
 
     // Now do a forwards pass and save the found chars
-    tiny::UnicodeCodepoints context;
+    tiny::UnicodeString context;
     for (int x = 0; x < range && s; x++) {
         auto got = s.get();
         if (got == '\n') {
             break;
         }
 
-        context.push_back(got);
+        context += got;
     }
 
     // Restore the stream's index
     s.seek(prevState);
 
 
-    auto ctxStr = tiny::UnicodeParser::toString(context);
+    auto ctxStr = context.toString();
     auto prevLength = std::int32_t(ctxStr.length());
 
     tiny::ltrim(ctxStr);

@@ -41,25 +41,23 @@ tiny::Lexeme tiny::Lexer::lex() {
 
     // We have non-empty char. Try to match it.
     tiny::StreamComparator comparator(s);
-    auto match = comparator.match(TOKEN_TABLE, Token::None);
-
-    switch (match) {
+    switch (auto match = comparator.match(TOKEN_TABLE, Token::None); match) {
         case Token::SinglelineComment: {
             meta.end += 2; // Account for the double-slash
 
-            UnicodeCodepoints comment;
+            tiny::UnicodeString comment;
             for (std::uint32_t peek = s.peek(); peek != '\n' && s; peek = s.peek()) {
-                comment.push_back(s.get());
+                comment += s.get();
 
             }
 
             meta.end = s.getIndex();
-            return Lexeme(tiny::Token::SinglelineComment, tiny::UnicodeParser::toString(comment), meta);
+            return Lexeme(tiny::Token::SinglelineComment, comment, meta);
         }
         case Token::MultilineComment: {
             meta.end += 2; // Account for the comment start
 
-            UnicodeCodepoints comment;
+            tiny::UnicodeString comment;
             while (true) {
                 if (!s) {
                     meta.end = s.getIndex();
@@ -71,10 +69,10 @@ tiny::Lexeme tiny::Lexer::lex() {
                     s.skip();
 
                     meta.end = s.getIndex();
-                    return Lexeme{tiny::Token::MultilineComment, tiny::UnicodeParser::toString(comment), meta};
+                    return Lexeme{tiny::Token::MultilineComment, comment, meta};
                 }
 
-                comment.push_back(got);
+                comment += got;
             }
         }
         case Token::None:
@@ -105,7 +103,7 @@ tiny::Lexeme tiny::Lexer::lex() {
     }
 
     meta.end = s.getIndex();
-    throw tiny::LexError("Unknown symbol '" + tiny::UnicodeParser::toString(input) + "'", meta);
+    throw tiny::LexError("Unknown symbol '" + tiny::UnicodeString(input).toString() + "'", meta);
 }
 
 tiny::Lexeme tiny::Lexer::lexId() {
@@ -117,33 +115,32 @@ tiny::Lexeme tiny::Lexer::lexId() {
         throw tiny::LexError("End-of-file while parsing ID", meta);
     }
 
-    UnicodeCodepoints id(1, input);
+    tiny::UnicodeString id(input);
 
     for (auto peek = s.peek();
          iswalpha(std::int32_t(peek)) || isdigit(char(peek)) || peek == '_'; peek = s.peek()) {
-        id.push_back(s.get());
+        id += s.get();
     }
 
-    auto match = KEYWORD_TABLE.find(id);
-    if (match != KEYWORD_TABLE.end()) {
+    if (auto match = KEYWORD_TABLE.find(id); match != KEYWORD_TABLE.end()) {
         return Lexeme(match->second, meta);
     }
 
-    return Lexeme(tiny::Token::Id, tiny::UnicodeParser::toString(id), meta);
+    return Lexeme(tiny::Token::Id, id, meta);
 }
 
 tiny::Lexeme tiny::Lexer::lexNumericLiteral() {
     auto meta = getMetadata();
 
     // The narrowing conversion is fine since all the numbers are at the very beginning of the Unicode table
-    char input = char(s.get());
+    auto input = char(s.get());
 
     if (input == StreamTerminator) {
         meta.end = s.getIndex();
         throw tiny::LexError("End-of-file while parsing numeric literal", meta);
     }
 
-    std::string number(1, input);
+    tiny::UnicodeString number(input);
     bool isHex = false;
 
     if (input == '0') {
@@ -155,29 +152,33 @@ tiny::Lexeme tiny::Lexer::lexNumericLiteral() {
 
         if (s.peek() == 'x') {
             // Prefixed hexadecimal literal (0xFFFF)
-            number.push_back(char(s.get()));
+            number += s.get();
             isHex = true;
         }
     }
 
+    // This function checks if a character is a posible continuation of a numeric value
     auto isContinuation = [](char c, bool hex) {
-        return (isdigit(c) || c == '.') || (hex && ((c >= 'A' && c <= 'F') || (c >= 'a' && c <= 'f')));
+        // If we are looking for base 10 numerics, any digit and a dot are valid characters.
+        // If we need to filter hex values, numbers and characters between A-F (upper- and lowercase)
+        // but no decimal dots are valid characters.
+
+        return (isdigit(c) || (!hex && c == '.')) || (hex && ((c >= 'A' && c <= 'F') || (c >= 'a' && c <= 'f')));
     };
 
-    for (char peek = char(s.peek()); isContinuation(peek, isHex); peek = char(s.peek())) {
+    for (auto peek = char(s.peek()); isContinuation(peek, isHex); peek = char(s.peek())) {
         auto got = s.get();
         if (got == '.' && s.peek() == '.') {
-            // We encountered a range (..) operator. Revert and return.
-
+            // We encountered a range (..) operator. Revert and stop parsing.
             s.backup();
             break;
         }
 
-        number.push_back(char(got));
+        number += got;
     }
 
     // Make sure we reject malformed decimal numbers like 3.12.14
-    if (std::count(number.begin(), number.end(), '.') > 1) {
+    if (std::count(number.codepoints.begin(), number.codepoints.end(), '.') > 1) {
         meta.end = s.getIndex();
         throw tiny::LexError("Numeric literal has two decimal points", meta);
     }
@@ -193,21 +194,21 @@ tiny::Lexeme tiny::Lexer::lexStrLiteral() {
         throw tiny::LexError("End-of-file while parsing string literal", meta);
     }
 
-    s.skip(); // StageStep-over the first "
+    s.skip(); // step-over the first "
 
-    tiny::UnicodeCodepoints str;
+    tiny::UnicodeString str;
     for (std::uint32_t peek = s.peek(); peek != '"'; peek = s.peek()) {
         if (peek == StreamTerminator) {
             meta.end = s.getIndex();
             throw tiny::LexError("End-of-file while parsing string literal", meta);
         }
 
-        str.push_back(s.get());
+        str += s.get();
     }
 
-    s.skip(); // StageStep-over the second "
+    s.skip(); // step-over the second "
 
-    return Lexeme(tiny::Token::LiteralStr, tiny::UnicodeParser::toString(str), meta);
+    return Lexeme(tiny::Token::LiteralStr, str, meta);
 }
 
 tiny::Lexeme tiny::Lexer::lexCharLiteral() {
@@ -218,7 +219,7 @@ tiny::Lexeme tiny::Lexer::lexCharLiteral() {
         throw tiny::LexError("End-of-file while parsing char literal", meta);
     }
 
-    s.skip(); // StageStep-over the first '
+    s.skip(); // step-over the first '
 
     std::uint32_t next = s.get();
     if (s.get() != '\'') {
@@ -226,7 +227,7 @@ tiny::Lexeme tiny::Lexer::lexCharLiteral() {
         throw tiny::LexError("Invalid char definition", meta);
     }
 
-    return Lexeme(tiny::Token::LiteralChar, tiny::UnicodeParser::toString(next), meta);
+    return Lexeme(tiny::Token::LiteralChar, tiny::UnicodeString(next), meta);
 }
 
 void tiny::Lexer::setMetadataFilename(std::string_view fn) {
@@ -241,11 +242,11 @@ std::string tiny::Lexeme::string() const {
     switch (token) {
         // Zero-value
         case Token::None:
-            return "<None, " + value + ">";
+            return "<None, " + value.toString() + ">";
 
             // Identifier
         case Token::Id:
-            return "<Identifier, " + value + ">";
+            return "<Identifier, " + value.toString() + ">";
 
             // Keywords
         case Token::KwModule:
@@ -400,9 +401,9 @@ std::string tiny::Lexeme::string() const {
 
             // Literals
         case Token::LiteralNum:
-            return "<Numeric Literal, " + value + ">";
+            return "<Numeric Literal, " + value.toString() + ">";
         case Token::LiteralStr:
-            return "<String Literal, " + value + ">";
+            return "<String Literal, " + value.toString() + ">";
         case Token::Negation:
             return "<Negation>";
 
@@ -414,63 +415,63 @@ std::string tiny::Lexeme::string() const {
 
             // Comments
         case Token::SinglelineComment:
-            return "<Singleline Comment, \"" + value + "\">";
+            return "<Singleline Comment, \"" + value.toString() + "\">";
         case Token::MultilineComment:
-            return "<Multiline Comment, \"" + value + "\">";
+            return "<Multiline Comment, \"" + value.toString() + "\">";
 
         default:
             return "<Unknown>";
     }
 }
 
-tiny::UnicodeCodepoints tiny::getTypeName(tiny::Token t) {
+tiny::UnicodeString tiny::getTypeName(tiny::Token t) {
     switch (t) {
         case tiny::Token::TypeAny:
-            return tiny::UnicodeParser::fromString("any");
+            return "any";
 
             // Integers
         case tiny::Token::TypeFixed8:
-            return tiny::UnicodeParser::fromString("fixed8");
+            return "fixed8";
         case tiny::Token::TypeFixed16:
-            return tiny::UnicodeParser::fromString("fixed16");
+            return "fixed16";
         case tiny::Token::TypeFixed32:
-            return tiny::UnicodeParser::fromString("fixed32");
+            return "fixed32";
         case tiny::Token::TypeFixed64:
-            return tiny::UnicodeParser::fromString("fixed64");
+            return "fixed64";
 
             // Fixed-point
         case tiny::Token::TypeInt8:
-            return tiny::UnicodeParser::fromString("int8");
+            return "int8";
         case tiny::Token::TypeInt16:
-            return tiny::UnicodeParser::fromString("int16");
+            return "int16";
         case tiny::Token::TypeInt32:
-            return tiny::UnicodeParser::fromString("int32");
+            return "int32";
         case tiny::Token::TypeInt64:
-            return tiny::UnicodeParser::fromString("int64");
+            return "int64";
 
             // Floating-point
         case tiny::Token::TypeFloat8:
-            return tiny::UnicodeParser::fromString("float8");
+            return "float8";
         case tiny::Token::TypeFloat16:
-            return tiny::UnicodeParser::fromString("float16");
+            return "float16";
         case tiny::Token::TypeFloat32:
-            return tiny::UnicodeParser::fromString("float32");
+            return "float32";
         case tiny::Token::TypeFloat64:
-            return tiny::UnicodeParser::fromString("float64");
+            return "float64";
 
         case tiny::Token::TypeBool:
-            return tiny::UnicodeParser::fromString("bool");
+            return "bool";
         case tiny::Token::TypeChar:
-            return tiny::UnicodeParser::fromString("char");
+            return "char";
         case tiny::Token::TypeString:
-            return tiny::UnicodeParser::fromString("string");
+            return "string";
 
         case tiny::Token::TypeList:
-            return tiny::UnicodeParser::fromString("list");
+            return "list";
         case tiny::Token::TypeDict:
-            return tiny::UnicodeParser::fromString("dict");
+            return "dict";
 
         default:
-            return {};
+            return "";
     }
 }

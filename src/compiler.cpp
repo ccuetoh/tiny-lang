@@ -57,7 +57,7 @@ tiny::CompilationResult tiny::Compiler::compile() {
         tiny::info("Compiling " + f.path.filename().string());
 
         std::ifstream filestream(f.path);
-        tiny::Stream<std::uint32_t> charStream(filestream);
+        tiny::Stream charStream(filestream);
 
         tiny::Lexer lexer(charStream);
         lexer.setMetadataFilename(f.path.filename().string());

@@ -67,7 +67,7 @@ tiny::ASTFile tiny::Parser::file(std::string_view filename, bool requireModule) 
 /*
  *  ModuleStatement ::= module STRING
  */
-std::string tiny::Parser::moduleStatement(bool optional) {
+tiny::UnicodeString tiny::Parser::moduleStatement(bool optional) {
     exhaust(SKIPABLE_TOKENS);
 
     if (!consumeOptional(tiny::Token::KwModule)) {
@@ -184,7 +184,7 @@ tiny::ASTNode tiny::Parser::errorHandledBlockStatement() {
             // Inlined block handle
             auto node = tiny::ASTNode(tiny::ASTNodeType::ErrorHandle, lhs, blockStatement());
 
-            auto varNameParam = tiny::Parameter(tiny::ParameterType::ErrorVarName, tiny::stringToValue(id.value));
+            auto varNameParam = tiny::Parameter(tiny::ParameterType::ErrorVarName, id.value);
             node.addParam(varNameParam);
 
             return node;
@@ -193,7 +193,7 @@ tiny::ASTNode tiny::Parser::errorHandledBlockStatement() {
         // Callback handler
         auto node = tiny::ASTNode(tiny::ASTNodeType::ErrorHandle, lhs);
 
-        auto callbackName = tiny::Parameter(tiny::ParameterType::ErrorCallback, tiny::stringToValue(id.value));
+        auto callbackName = tiny::Parameter(tiny::ParameterType::ErrorCallback, id.value);
         node.addParam(callbackName);
 
         return node;
@@ -295,7 +295,7 @@ tiny::ASTNode tiny::Parser::rangeExpression() {
     tiny::ASTNode node(tiny::ASTNodeType::RangeExpression);
 
     auto id = consume(tiny::Token::Id);
-    node.addParam(tiny::Parameter(tiny::ParameterType::RangeIdentifier, tiny::stringToValue(id.value)));
+    node.addParam(tiny::Parameter(tiny::ParameterType::RangeIdentifier, id.value));
 
     consume(tiny::Token::Init);
 
@@ -326,7 +326,7 @@ tiny::ASTNode tiny::Parser::forEachExpression() {
     tiny::ASTNode node(tiny::ASTNodeType::ForEachExpression);
 
     auto id = consume(tiny::Token::Id);
-    node.addParam(tiny::Parameter(tiny::ParameterType::RangeIdentifier, tiny::stringToValue(id.value)));
+    node.addParam(tiny::Parameter(tiny::ParameterType::RangeIdentifier, id.value));
 
     consume(tiny::Token::KwIn);
 
@@ -357,7 +357,7 @@ tiny::ASTNode tiny::Parser::funcDeclStatement(bool isPrototype) {
     }
 
     auto id = consume(tiny::Token::Id);
-    node.addParam(tiny::Parameter(tiny::ParameterType::Name, tiny::stringToValue(id.value)));
+    node.addParam(tiny::Parameter(tiny::ParameterType::Name, id.value));
 
     node.addChildren(argumentDeclList(!isPrototype));
     node.addChildren(returnDeclList());
@@ -679,7 +679,7 @@ tiny::ASTNode tiny::Parser::errorHandleExpression() {
             // Inlined block handle
             auto node = tiny::ASTNode(tiny::ASTNodeType::ErrorHandle, lhs, blockStatement());
 
-            auto varNameParam = tiny::Parameter(tiny::ParameterType::ErrorVarName, tiny::stringToValue(id.value));
+            auto varNameParam = tiny::Parameter(tiny::ParameterType::ErrorVarName, id.value);
             node.addParam(varNameParam);
 
             return node;
@@ -688,7 +688,7 @@ tiny::ASTNode tiny::Parser::errorHandleExpression() {
         // Callback handler
         auto node = tiny::ASTNode(tiny::ASTNodeType::ErrorHandle, lhs);
 
-        auto callbackName = tiny::Parameter(tiny::ParameterType::ErrorCallback, tiny::stringToValue(id.value));
+        auto callbackName = tiny::Parameter(tiny::ParameterType::ErrorCallback, id.value);
         node.addParam(callbackName);
 
         return node;
@@ -1047,7 +1047,7 @@ tiny::ASTNode tiny::Parser::typedExpression() {
         tiny::ASTNode node(tiny::ASTNodeType::TypedExpression);
         node.addChildren(addressableType());
 
-        node.val = tiny::stringToValue(consume(tiny::Token::Id).value);
+        node.val = consume(tiny::Token::Id).value;
 
         return node;
     } catch (tiny::ParseError &) {
@@ -1115,16 +1115,16 @@ tiny::ASTNode tiny::Parser::literalNum() {
     // TODO ? Check if the number doesn't fit into a int64 or it's an unsigned number
     auto lexeme = consume(tiny::Token::LiteralNum);
 
-    if (lexeme.value.find('.') != std::string::npos) { // Check if it's a decimal number
+    if (lexeme.value.toString().find('.') != std::string::npos) { // Check if it's a decimal number
         auto node = tiny::ASTNode(tiny::ASTNodeType::LiteralDecimal);
-        node.val = std::stold(lexeme.value);
+        node.val = std::stold(lexeme.value.toString());
 
         return node;
     }
 
     // Default to an int64
     auto node = tiny::ASTNode(tiny::ASTNodeType::LiteralInt);
-    node.val = std::int64_t(std::stoll(lexeme.value, nullptr, 0));
+    node.val = std::int64_t(std::stoll(lexeme.value.toString(), nullptr, 0));
 
     return node;
 }
@@ -1136,7 +1136,7 @@ tiny::ASTNode tiny::Parser::literalStr() {
     auto lexeme = consume(tiny::Token::LiteralStr);
 
     auto node = tiny::ASTNode(tiny::ASTNodeType::LiteralString);
-    node.val = tiny::UnicodeParser::fromString(lexeme.value);
+    node.val = tiny::UnicodeString(lexeme.value);
 
     return node;
 }
@@ -1149,7 +1149,7 @@ tiny::ASTNode tiny::Parser::literalChar() {
     auto lexeme = consume(tiny::Token::LiteralChar);
 
     auto node = tiny::ASTNode(tiny::ASTNodeType::LiteralChar);
-    node.val = tiny::UnicodeParser::fromString(lexeme.value);
+    node.val = tiny::UnicodeString(lexeme.value);
 
     return node;
 }
@@ -1206,7 +1206,7 @@ tiny::ASTNode tiny::Parser::addressableIdentifier() {
  *  Identifier ::= STRING
  */
 tiny::ASTNode tiny::Parser::identifier() {
-    return tiny::ASTNode(tiny::ASTNodeType::Identifier, tiny::stringToValue(consume(tiny::Token::Id).value));
+    return tiny::ASTNode(tiny::ASTNodeType::Identifier, consume(tiny::Token::Id).value);
 }
 
 /*
