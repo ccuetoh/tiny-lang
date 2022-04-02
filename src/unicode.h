@@ -93,6 +93,13 @@ namespace tiny {
         [[nodiscard]] explicit operator bool() const {
             return codepoints.empty();
         }
+
+        /*!
+        * \brief Returns the i-th codepoint in the string
+        */
+        [[nodiscard]] std::uint32_t  operator [](const int &i) const {
+            return codepoints[i];
+        }
     };
 }
 

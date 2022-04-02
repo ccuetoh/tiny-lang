@@ -16,9 +16,9 @@
 std::random_device rd;
 std::mt19937 randomGen(rd());
 
-tiny::UnicodeString idRandChars = tiny::UnicodeString(
-        "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzáÁäÄçÇúÚüÜéÉëËóÓöÖíÍïÏ_");
-std::map<std::string, tiny::Lexeme> tokenRand{
+tiny::UnicodeString idRandChars =
+        "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzáÁäÄçÇúÚüÜéÉëËóÓöÖíÍïÏ_";
+std::map<tiny::UnicodeString, tiny::Lexeme> tokenRand{
         {"func",          tiny::Lexeme(tiny::Token::KwFunc)},
         {"as",            tiny::Lexeme(tiny::Token::KwAs)},
         {"for",           tiny::Lexeme(tiny::Token::KwFor)},
@@ -44,20 +44,24 @@ std::map<std::string, tiny::Lexeme> tokenRand{
 };
 
 tiny::Lexeme randomId() {
-    std::string id;
+    tiny::UnicodeString id;
     do {
-        std::shuffle(idRandChars.begin(), idRandChars.end(), randomGen);
+        id = "";
+        std::shuffle(idRandChars.codepoints.begin(), idRandChars.codepoints.end(), randomGen);
 
-        std::uniform_int_distribution<std::int32_t> uni(1, std::int32_t(idRandChars.size() - 1));
-        std::int32_t size = uni(randomGen);
+        std::uniform_int_distribution uni(1, std::int32_t(idRandChars.codepoints.size() - 1));
 
-        id = tiny::UnicodeParser::toString(tiny::UnicodeString(idRandChars.begin(), idRandChars.begin() + size));
-    } while (isdigit(id[0]));
+
+        for (std::int32_t size = uni(randomGen); size > 0; size--) {
+            id += idRandChars[size];
+        }
+
+    } while (isdigit(id.toString()[0]));
 
     return tiny::Lexeme(tiny::Token::Id, id);
 }
 
-std::pair<std::string, tiny::Lexeme> randomLexeme() {
+std::pair<tiny::UnicodeString, tiny::Lexeme> randomLexeme() {
     std::uniform_int_distribution<std::int32_t> zeroToOne(0, 1);
     if (zeroToOne(randomGen) < .333) { // 1/3 chance
         auto id = randomId();
@@ -709,7 +713,7 @@ TEST(Lexer, Benchmark) {
     for (std::int32_t n = 0; n < benchmarkSize; n++) {
         auto lexemePair = randomLexeme();
 
-        program << " " + lexemePair.first;
+        program << " " + lexemePair.first.toString();
         expect.push_back(lexemePair.second);
     }
 

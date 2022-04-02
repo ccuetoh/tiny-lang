@@ -25,6 +25,7 @@ out
 # ownCloud sync files
 .owncloudsync.log
 .sync_journal.*
+Desktop.ini
 
 # Doxygen files
 Doxyfile
@@ -33,4 +34,3 @@ doxygen
 # Google test build folders
 googletest-*
 /_deps/
-
