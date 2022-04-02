@@ -356,13 +356,13 @@ namespace tiny {
          * \brief Builds the Lexer stream from a Stream<char>
          * \param stream The character stream to feed into the Lexer
          */
-        explicit Lexer(tiny::Stream<std::uint32_t> stream) : s(std::move(stream)) {};
+        explicit Lexer(const tiny::Stream<std::uint32_t> &stream) : s(stream) {};
 
         /*!
          * \brief Builds the lexer stream from an std::istream
          * \param stream The character stream to feed into the Lexer
          */
-        explicit Lexer(std::istream &stream) : s(stream, StreamTerminator) {};
+        explicit Lexer(std::istream &stream) : s(stream) { s.setTerminator(StreamTerminator); };
 
         /*!
          * \brief Checks whether the underlying stream has readable data
