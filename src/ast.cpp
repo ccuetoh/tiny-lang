@@ -1,3 +1,4 @@
+#include <fstream>
 #include "ast.h"
 
 tiny::ASTNode::ASTNode(tiny::ASTNodeType t, const tiny::ASTNode &c1) : type(t) {
@@ -269,8 +270,8 @@ std::string tiny::Parameter::toString() const {
 }
 
 std::string tiny::toString(tiny::Value val) {
-    if (std::holds_alternative<tiny::UnicodeString>(val)) {
-        return std::get<tiny::UnicodeString>(val).toString();
+    if (std::holds_alternative<tiny::String>(val)) {
+        return std::get<tiny::String>(val).toString();
     }
 
     if (std::holds_alternative<std::int64_t>(val)) {
@@ -324,4 +325,11 @@ void tiny::ASTNode::addChildren(const tiny::StatementList &cs) {
     for (auto &n: cs) {
         children.push_back(std::make_shared<tiny::ASTNode>(n));
     }
+}
+
+void tiny::ASTFile::dumpJson(const std::filesystem::path &path) const {
+    std::ofstream jsonOut;
+    jsonOut.open(path);
+    jsonOut << toJson().dump(4);
+    jsonOut.close();
 }

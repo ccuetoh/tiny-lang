@@ -16,12 +16,13 @@ namespace tiny {
     struct LogMsg;
 
     //! Logging levels. When a level is selected, messages with a higher level will not be logged.
-    enum class LogLv {
-        Debug,
-        Info,
-        Warning,
-        Error,
-        Fatal,
+    enum class LogLevel: std::int32_t {
+        Debug = 4,
+        Info = 3,
+        Warning = 2,
+        Error = 1,
+        Fatal = 0,
+        Disable = -1,
     };
 
     /*!
@@ -33,6 +34,9 @@ namespace tiny {
      */
     class Logger {
     public:
+        Logger(Logger const &) = delete;              // Meyers' singleton pattern. Don't Implement
+        void operator=(Logger const &) = delete;      // Ibidem
+
         /*!
          * \brief Fetches the Logger's singleton instance
          * \return The Logger's singleton instance
@@ -48,13 +52,13 @@ namespace tiny {
          * \brief Sets the current logging level
          * \param lv Logging level
          */
-        void setLevel(tiny::LogLv lv);
+        void setLevel(tiny::LogLevel lv);
 
         /*!
         * \brief Gets the current logging level
         * \return Current logging level
         */
-        [[nodiscard]] tiny::LogLv getLevel() const;
+        [[nodiscard]] tiny::LogLevel getLevel() const;
 
         /*!
         * \brief Logs a message using its logging level
@@ -67,7 +71,7 @@ namespace tiny {
         * \param lv Level to log at
         * \param msg Message to log
         */
-        void log(tiny::LogLv lv, const std::string &msg);
+        void log(tiny::LogLevel lv, const std::string &msg);
 
         /*!
         * \brief Logs a message at the Debug level
@@ -102,9 +106,6 @@ namespace tiny {
     private:
         Logger() = default;
 
-        Logger(Logger const &);              // Meyers' singleton pattern. Don't Implement
-        void operator=(Logger const &);      // Ibidem
-
         //! Stream on which to log
         std::ostream& stream = std::cout;
 
@@ -112,7 +113,7 @@ namespace tiny {
         std::mutex mutex;
 
         //! Current logging-level. Defaults to Info.
-        tiny::LogLv level = LogLv::Info;
+        tiny::LogLevel level = LogLevel::Info;
     };
 
     //! Defines a message for the Logger.
@@ -122,20 +123,20 @@ namespace tiny {
         * \param level The logging level
         * \param msg Content of the message
         */
-        LogMsg(tiny::LogLv level, std::string msg) : content(std::move(msg)), level(level) {}
+        LogMsg(tiny::LogLevel level, std::string msg) :content(std::move(msg)), level(level) {}
 
         //! Content of the log
         std::string content;
 
         //! Level of the error
-        tiny::LogLv level = tiny::LogLv::Info;
+        tiny::LogLevel level = tiny::LogLevel::Info;
 
         /*!
         * \brief Returns a string with the logging level's name (Debug will return "DEBUG)
         * \param lv The logging level
         * \return An uppercase string with the logging level's name
         */
-        static std::string levelToString(LogLv lv);
+        static std::string levelToString(LogLevel lv);
 
         /*!
         * \brief Returns the a console color based on the level provided
@@ -145,7 +146,7 @@ namespace tiny {
         * Returns the a console color based on the level provided. The color varies depending on the host OS. In
         * Windows systems the Windows' API coloring code is provided, otherwise the ANSI escape code color is returned.
         */
-        [[nodiscard]] static std::int32_t levelColour(LogLv lv);
+        [[nodiscard]] static std::int32_t levelColour(LogLevel lv);
     };
 
 #if !defined(TINY_DISABLE_COMPACT_LOGGING)
@@ -155,6 +156,7 @@ namespace tiny {
     inline auto error(const std::string& msg) { tiny::Logger::get().error(msg); }
     inline auto fatal(const std::string& msg) { tiny::Logger::get().fatal(msg); }
 #endif
+
 }
 
 

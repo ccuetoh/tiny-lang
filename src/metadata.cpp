@@ -42,7 +42,7 @@ tiny::Metadata::getContext(tiny::Stream<std::uint32_t> &s, std::int32_t range) c
     }
 
     // Now do a forwards pass and save the found chars
-    tiny::UnicodeString context;
+    tiny::String context;
     for (int x = 0; x < range && s; x++) {
         auto got = s.get();
         if (got == '\n') {

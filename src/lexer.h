@@ -53,19 +53,13 @@ namespace tiny {
         TypeUInt64, // uint64
 
         // Fixed-point
-        TypeFixed8, // fixed8
-        TypeFixed16, // fixed16
         TypeFixed32, // fixed32, fixed
         TypeFixed64, // fixed64
 
-        TypeUFixed8, // ufixed8
-        TypeUFixed16, // ufixed16
         TypeUFixed32, // ufixed32, ufixed
         TypeUFixed64, // ufixed64
 
         // Floating-point
-        TypeFloat8, // float8
-        TypeFloat16, // float16
         TypeFloat32, // float32, float
         TypeFloat64, // float64
 
@@ -144,82 +138,20 @@ namespace tiny {
      * Returns an UnicodeCodepoints representation of the name of the token type. For example Token::TypeString will
      * become "string".
      */
-    [[nodiscard]] tiny::UnicodeString getTypeName(tiny::Token t);
-
-    //! Holds a table between keywords and their token. For example the UnicodeCodepoints for "string" maps to Token::TypeString
-    static const std::map<tiny::UnicodeString, Token> KEYWORD_TABLE{
-            // Keywords
-            {"const",    Token::KwConst},
-            {"import",   Token::KwImport},
-            {"module",   Token::KwModule},
-            {"struct",   Token::KwStruct},
-            {"trait",    Token::KwTrait},
-            {"func",     Token::KwFunc},
-            {"as",       Token::KwAs},
-            {"if",       Token::KwIf},
-            {"in",       Token::KwIn},
-            {"else",     Token::KwElse},
-            {"for",      Token::KwFor},
-            {"return",   Token::KwReturn},
-            {"and",      Token::KwAnd},
-            {"or",       Token::KwOr},
-
-            // Types
-
-            // Integer
-            {"int",      Token::TypeInt32}, // int is an alias for int32
-            {"int16",    Token::TypeInt16},
-            {"int32",    Token::TypeInt32},
-            {"int64",    Token::TypeInt64},
-
-            {"uint",     Token::TypeUInt32}, // uint is an alias for uint32
-            {"uint8",    Token::TypeUInt8},
-            {"uint16",   Token::TypeUInt16},
-            {"uint32",   Token::TypeUInt32},
-            {"uint64",   Token::TypeUInt64},
-
-            // Fixed-point
-            {"fixed",    Token::TypeFixed32}, // fixed is an alias for fixed32
-            {"fixed16",  Token::TypeFixed16},
-            {"fixed32",  Token::TypeFixed32},
-            {"fixed64",  Token::TypeFixed64},
-
-            {"ufixed",   Token::TypeUFixed32}, // ufixed is an alias for ufixed32
-            {"ufixed8",  Token::TypeUFixed8},
-            {"ufixed16", Token::TypeUFixed16},
-            {"ufixed32", Token::TypeUFixed32},
-            {"ufixed64", Token::TypeUFixed64},
-
-            // Floating-point
-            {"float",    Token::TypeFloat32}, // float is an alias for float32
-            {"float8",   Token::TypeFloat8},
-            {"float16",  Token::TypeFloat16},
-            {"float32",  Token::TypeFloat32},
-            {"float64",  Token::TypeFloat64},
-
-            {"bool",     Token::TypeBool},
-            {"char",     Token::TypeChar},
-            {"string",   Token::TypeString},
-
-            {"list",     Token::TypeList},
-            {"dict",     Token::TypeDict},
-
-            {"any",      Token::TypeAny},
-
-            {"None",     Token::LiteralNone},
-            {"True",     Token::LiteralTrue},
-            {"False",    Token::LiteralFalse},
-    };
+    [[nodiscard]] tiny::String getTypeName(tiny::Token t);
 
     //! A Lexeme is the product of the Lexer. It defines a token and optionally it's associated data.
     struct Lexeme {
         explicit Lexeme() = default;
+        Lexeme(const Lexeme &l2) = default;
 
         /*!
          * \brief Create a lexeme with a blank value
          * \param token Token held by the Lexeme
          */
         explicit Lexeme(Token token) : token(token) {};
+
+
 
         /*!
          * \brief Create a new lexeme with a blank value but with metadata
@@ -233,7 +165,7 @@ namespace tiny {
          * \param token Token held by the Lexeme
          * \param val Value of the Lexeme
          */
-        explicit Lexeme(Token token, tiny::UnicodeString val) : token(token), value(std::move(val)) {};
+        explicit Lexeme(Token token, tiny::String val) :token(token), value(std::move(val)) {};
 
         /*!
           * \brief Create a new lexeme with a value and metadata
@@ -241,14 +173,14 @@ namespace tiny {
           * \param val Value of the Lexeme
           * \param md Metadata of the Lexeme
           */
-        explicit Lexeme(Token token, tiny::UnicodeString val, tiny::Metadata md) : token(token), value(std::move(val)),
-                                                                                metadata(std::move(md)) {};
+        explicit Lexeme(Token token, tiny::String val, tiny::Metadata md) :token(token), value(std::move(val)),
+                                                                           metadata(std::move(md)) {};
 
         //! The Token of the lexeme.
         Token token = Token::None;
 
         //! The optional associated data of the lexeme.
-        tiny::UnicodeString value;
+        tiny::String value;
 
         //! Information of the file that produced the token
         tiny::Metadata metadata;
@@ -362,7 +294,7 @@ namespace tiny {
          * \brief Builds the lexer stream from an std::istream
          * \param stream The character stream to feed into the Lexer
          */
-        explicit Lexer(std::istream &stream) : s(stream) { s.setTerminator(StreamTerminator); };
+        explicit Lexer(std::istream &stream) : s(stream) { s.setTerminator(std::uint32_t(StreamTerminator)); };
 
         /*!
          * \brief Checks whether the underlying stream has readable data
@@ -371,6 +303,66 @@ namespace tiny {
         explicit operator bool() const {
             return bool(s);
         }
+
+        //! Holds a table between keywords and their associated token
+        inline static std::map<tiny::String, Token>  KEYWORD_TABLE{
+                // Keywords
+                {"const",    Token::KwConst},
+                {"import",   Token::KwImport},
+                {"module",   Token::KwModule},
+                {"struct",   Token::KwStruct},
+                {"trait",    Token::KwTrait},
+                {"func",     Token::KwFunc},
+                {"as",       Token::KwAs},
+                {"if",       Token::KwIf},
+                {"in",       Token::KwIn},
+                {"else",     Token::KwElse},
+                {"for",      Token::KwFor},
+                {"return",   Token::KwReturn},
+                {"and",      Token::KwAnd},
+                {"or",       Token::KwOr},
+
+                // Types
+
+                // Integer
+                {"int",      Token::TypeInt32}, // int is an alias for int32
+                {"int16",    Token::TypeInt16},
+                {"int32",    Token::TypeInt32},
+                {"int64",    Token::TypeInt64},
+
+                {"uint",     Token::TypeUInt32}, // uint is an alias for uint32
+                {"uint8",    Token::TypeUInt8},
+                {"uint16",   Token::TypeUInt16},
+                {"uint32",   Token::TypeUInt32},
+                {"uint64",   Token::TypeUInt64},
+
+                // Fixed-point
+                {"fixed",    Token::TypeFixed32}, // fixed is an alias for fixed32
+                {"fixed32",  Token::TypeFixed32},
+                {"fixed64",  Token::TypeFixed64},
+
+                {"ufixed",   Token::TypeUFixed32}, // ufixed is an alias for ufixed32
+                {"ufixed32", Token::TypeUFixed32},
+                {"ufixed64", Token::TypeUFixed64},
+
+                // Floating-point
+                {"float",    Token::TypeFloat32}, // float is an alias for float32
+                {"float32",  Token::TypeFloat32},
+                {"float64",  Token::TypeFloat64},
+
+                {"bool",     Token::TypeBool},
+                {"char",     Token::TypeChar},
+                {"string",   Token::TypeString},
+
+                {"list",     Token::TypeList},
+                {"dict",     Token::TypeDict},
+
+                {"any",      Token::TypeAny},
+
+                {"None",     Token::LiteralNone},
+                {"True",     Token::LiteralTrue},
+                {"False",    Token::LiteralFalse},
+        };
 
         /*!
          * \brief Runs the lexer until a lexeme can be returned

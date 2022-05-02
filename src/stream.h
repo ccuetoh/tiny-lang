@@ -11,7 +11,7 @@
 
 namespace tiny {
     //! The underlying type of the stream's data
-    template<typename T>
+    template<typename T = std::uint32_t>
     //! A Stream wraps a vector so it can be accessed sequentially and similar to a stream
     class Stream {
     public:
@@ -37,7 +37,7 @@ namespace tiny {
          * \param stream A stream of UTF-8 encoded characters to add to the Stream
          * \param terminator An optional terminator to return if the stream's length is exceeded
          */
-        explicit Stream(std::istream &stream) : collection(tiny::UnicodeString(stream).data()) {};
+        explicit Stream(std::istream &stream) : collection(tiny::String(stream).data()) {};
 
         /*!
          * \brief Check whether the end of the stream has been reached
@@ -180,7 +180,7 @@ namespace tiny {
          * \brief Replaces the terminator value
          * \param t The new terminator value
          */
-        void setTerminator(T t) const {
+        void setTerminator(const T &t) {
             terminator = t;
         }
 
@@ -206,7 +206,7 @@ namespace tiny {
         std::vector<T> collection;
 
         //! Current index of the cursor
-        unsigned long index = 0;
+        std::uint64_t index = 0;
 
         //! Terminator value
         T terminator{};

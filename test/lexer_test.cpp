@@ -16,9 +16,9 @@
 std::random_device rd;
 std::mt19937 randomGen(rd());
 
-tiny::UnicodeString idRandChars =
+tiny::String idRandChars =
         "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzáÁäÄçÇúÚüÜéÉëËóÓöÖíÍïÏ_";
-std::map<tiny::UnicodeString, tiny::Lexeme> tokenRand{
+std::map<tiny::String, tiny::Lexeme> tokenRand{
         {"func",          tiny::Lexeme(tiny::Token::KwFunc)},
         {"as",            tiny::Lexeme(tiny::Token::KwAs)},
         {"for",           tiny::Lexeme(tiny::Token::KwFor)},
@@ -44,7 +44,7 @@ std::map<tiny::UnicodeString, tiny::Lexeme> tokenRand{
 };
 
 tiny::Lexeme randomId() {
-    tiny::UnicodeString id;
+    tiny::String id;
     do {
         id = "";
         std::shuffle(idRandChars.codepoints.begin(), idRandChars.codepoints.end(), randomGen);
@@ -61,7 +61,7 @@ tiny::Lexeme randomId() {
     return tiny::Lexeme(tiny::Token::Id, id);
 }
 
-std::pair<tiny::UnicodeString, tiny::Lexeme> randomLexeme() {
+std::pair<tiny::String, tiny::Lexeme> randomLexeme() {
     std::uniform_int_distribution<std::int32_t> zeroToOne(0, 1);
     if (zeroToOne(randomGen) < .333) { // 1/3 chance
         auto id = randomId();
@@ -152,18 +152,16 @@ TEST(Lexer, Ints) {
 
 TEST(Lexer, Fixed) {
     std::stringstream data;
-    data << "fixed fixed16 fixed32 fixed64 ufixed ufixed16 ufixed32 ufixed64";
+    data << "fixed fixed32 fixed64 ufixed ufixed32 ufixed64";
 
     tiny::Lexer lexer(data);
 
     auto lexemes = lexer.lexAll();
     std::vector<tiny::Lexeme> expect{
             tiny::Lexeme(tiny::Token::TypeFixed32),
-            tiny::Lexeme(tiny::Token::TypeFixed16),
             tiny::Lexeme(tiny::Token::TypeFixed32),
             tiny::Lexeme(tiny::Token::TypeFixed64),
             tiny::Lexeme(tiny::Token::TypeUFixed32),
-            tiny::Lexeme(tiny::Token::TypeUFixed16),
             tiny::Lexeme(tiny::Token::TypeUFixed32),
             tiny::Lexeme(tiny::Token::TypeUFixed64),
     };
@@ -173,14 +171,13 @@ TEST(Lexer, Fixed) {
 
 TEST(Lexer, Float) {
     std::stringstream data;
-    data << "float float16 float32 float64";
+    data << "float float32 float64";
 
     tiny::Lexer lexer(data);
 
     auto lexemes = lexer.lexAll();
     std::vector<tiny::Lexeme> expect{
             tiny::Lexeme(tiny::Token::TypeFloat32),
-            tiny::Lexeme(tiny::Token::TypeFloat16),
             tiny::Lexeme(tiny::Token::TypeFloat32),
             tiny::Lexeme(tiny::Token::TypeFloat64),
     };

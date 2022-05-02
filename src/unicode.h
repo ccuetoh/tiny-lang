@@ -10,35 +10,35 @@
 #include "utf8.h"
 
 namespace tiny {
-    class UnicodeString {
+    class String {
     public:
         std::vector<std::uint32_t> codepoints = {};
 
-        explicit UnicodeString() = default;
+        explicit String() = default;
 
         /*!
          * \brief Transforms a char stream into a unicode string
          * \param stream An UTF-8 encoded char stream
          */
-        explicit UnicodeString(const std::istream &stream);
+        explicit String(const std::istream &stream);
 
         /*!
          * \brief Transforms a std::string into a unicode string
          * \param str A UTF-8 encoded std::string
          */
-        explicit UnicodeString(std::string_view str);
+        explicit String(std::string_view str);
 
         /*!
          * \brief Transforms a std::uint32_t representing a wide char into a unicode string
          * \param str A UTF-8 encoded std::string
          */
-        explicit UnicodeString(std::uint32_t c);
+        explicit String(std::uint32_t c);
 
         /*!
          * \brief Transforms a C-string into a unicode string
          * \param str A UTF-8 encoded C-string
          */
-        UnicodeString(const char str[]): UnicodeString(std::string_view(str)) {};
+        String(const char str[]):String(std::string_view(str)) {};
 
         /*!
          * \brief Transforms a UnicodeString vector into a std::string
@@ -55,7 +55,7 @@ namespace tiny {
         /*!
          * \brief Less-than operator for UnicodeStrings. Uses the std::string implementation
          */
-        [[nodiscard]] bool operator < (const tiny::UnicodeString &str2) const {
+        [[nodiscard]] bool operator < (const tiny::String &str2) const {
              return toString() < str2.toString();
          }
 
@@ -69,21 +69,21 @@ namespace tiny {
         /*!
         * \brief Appends a string
         */
-        void operator += (const tiny::UnicodeString &str) {
+        void operator += (const tiny::String &str) {
             codepoints.insert(codepoints.end(), str.codepoints.begin(), str.codepoints.end());
         }
 
         /*!
         * \brief Compares two strings
         */
-        [[nodiscard]] bool operator == (const tiny::UnicodeString &str) const {
+        [[nodiscard]] bool operator == (const tiny::String &str) const {
             return codepoints == str.codepoints;
         }
 
         /*!
         * \brief Asserts the difference between two strings
         */
-        [[nodiscard]] bool operator != (const tiny::UnicodeString &str) const {
+        [[nodiscard]] bool operator != (const tiny::String &str) const {
             return codepoints != str.codepoints;
         }
 

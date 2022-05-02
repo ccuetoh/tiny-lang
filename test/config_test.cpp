@@ -2,7 +2,7 @@
 
 #include "stream.h"
 
-TEST(Stream, StreamOperations) {
+TEST(WalkableStream, StreamOperations) {
     std::vector<std::int32_t> vec = {1, 2, 3, 4, 5};
     auto ws = tiny::Stream(vec);
 
@@ -28,7 +28,7 @@ TEST(Stream, StreamOperations) {
     ASSERT_EQ(ws.peek(), 3);
 }
 
-TEST(Stream, StreamLargeVector) {
+TEST(WalkableStream, StreamLargeVector) {
     std::vector<long> vec;
     for (long i = 0; i < 9999999; i++) {
         vec.push_back(i);

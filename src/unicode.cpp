@@ -1,6 +1,6 @@
 #include "unicode.h"
 
-tiny::UnicodeString::UnicodeString(const std::istream &stream) {
+tiny::String::String(const std::istream &stream) {
     std::istreambuf_iterator<char> it(stream.rdbuf());
     std::istreambuf_iterator<char> eos;
 
@@ -14,7 +14,7 @@ tiny::UnicodeString::UnicodeString(const std::istream &stream) {
     }
 }
 
-tiny::UnicodeString::UnicodeString(std::string_view str) {
+tiny::String::String(std::string_view str) {
     auto it = str.begin();
 
     try {
@@ -27,12 +27,12 @@ tiny::UnicodeString::UnicodeString(std::string_view str) {
     }
 }
 
-tiny::UnicodeString::UnicodeString(std::uint32_t c)
+tiny::String::String(std::uint32_t c)
 {
     codepoints.push_back(c);
 }
 
-std::string tiny::UnicodeString::toString() const {
+std::string tiny::String::toString() const {
     std::string str;
     for (auto const &codepoint: codepoints) {
         if (codepoint <= 0x7f)
@@ -55,7 +55,7 @@ std::string tiny::UnicodeString::toString() const {
     return str;
 }
 
-std::vector<std::uint32_t> tiny::UnicodeString::data() const
+std::vector<std::uint32_t> tiny::String::data() const
 {
     return codepoints;
 }

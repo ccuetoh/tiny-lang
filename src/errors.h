@@ -50,6 +50,11 @@ namespace tiny {
         using CompilerError::CompilerError; // Inherit the constructor
     };
 
+    //! Gets thrown by the semantic analyzer when a identifier gets redefined and is not a variable
+    struct IlegalRedefinitionError : tiny::CompilerError {
+        using CompilerError::CompilerError; // Inherit the constructor
+    };
+
     //! Gets thrown when a script in the pipeline reports an error
     struct PipelineError : public std::exception {
         //! Name of the stage
@@ -143,9 +148,14 @@ namespace tiny {
         using FileError::FileError; // Inherit the constructor
     };
 
-    //! Gets thrown when an abstract class function is directly called
-    struct NotImplementedError : public std::logic_error {
-        NotImplementedError() : std::logic_error("Not implemented") {};
+    struct CLIError : public std::exception {
+        //! A message describing the error
+        std::string msg = "Command error";
+
+        /*!
+         * \brief Creates a new CLIError
+         */
+        explicit CLIError(std::string msg): msg(std::move(msg)) {};
     };
 }
 

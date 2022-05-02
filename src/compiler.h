@@ -65,7 +65,7 @@ namespace tiny {
          * If the logger is set the compilation process will log information and errors to it. If the logger is null, logging
          * understood as disabled.
          */
-        tiny::CompilationResult compile();
+        tiny::CompilationResult compile() const;
 
     private:
         //! The compilation Pipeline to support scripting

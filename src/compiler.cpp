@@ -1,10 +1,11 @@
 #include "compiler.h"
+#include "config.h"
 
 std::string tiny::Compiler::getSignature() {
     return TINY_NAME + " " + TINY_VERSION + " (" + TINY_VERSION_NICKNAME + ")";
 }
 
-tiny::CompilationResult tiny::Compiler::compile() {
+tiny::CompilationResult tiny::Compiler::compile() const {
     // Run the compilation steps in sequence, and then apply the pipeline to the stage
 
     tiny::debug(getSignature());
@@ -73,7 +74,7 @@ tiny::CompilationResult tiny::Compiler::compile() {
 
         try {
             lexemes = lexer.lexAll();
-        } catch (tiny::LexError &e) {
+        } catch (const tiny::LexError &e) {
             tiny::error(e.what());
             e.log(charStream);
             tiny::fatal("Invalid program");
@@ -84,7 +85,7 @@ tiny::CompilationResult tiny::Compiler::compile() {
         tiny::debug("Running lex pipe with length " + std::to_string(pl.getPipeLength(tiny::CompilationStep::Lexer)));
         lexemes = pl.runLexPipe(lexemes);
 
-        tiny::Stream<tiny::Lexeme> lexemeStream(lexemes, tiny::Lexeme(tiny::Token::None));
+        tiny::Stream<tiny::Lexeme> lexemeStream(lexemes);
         tiny::Parser parser(lexemeStream);
 
         tiny::debug("Parsing..");
@@ -98,7 +99,7 @@ tiny::CompilationResult tiny::Compiler::compile() {
         tiny::ASTFile astFile;
         try {
             astFile = parser.file(f.path.filename().string());
-        } catch (tiny::ParseError &e) {
+        } catch (const tiny::ParseError &e) {
             tiny::error(e.what());
             e.log(charStream);
             tiny::fatal("Invalid program");
@@ -116,15 +117,9 @@ tiny::CompilationResult tiny::Compiler::compile() {
         tiny::debug("Running parse pipe with length " + std::to_string(pl.getPipeLength(tiny::CompilationStep::Parser)));
         astFile = pl.runParsePipe(astFile);
 
-        /*
-         * For now we just output the AST to a file as a JSON document
-         */
-
-        // TODO Move to argument option
-        std::ofstream jsonOut;
-        jsonOut.open("" + f.path.filename().string() + ".ast.json");
-        jsonOut << astFile.toJson().dump(4);
-        jsonOut.close();
+        if (tiny::getSetting(tiny::Option::OutputASTJSON).isEnabled) {
+            astFile.dumpJson(f.path.filename().string() + ".ast.json");
+        }
 
         astFiles.push_back(astFile);
     }

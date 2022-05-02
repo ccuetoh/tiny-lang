@@ -5,6 +5,7 @@
 #include <utility>
 #include <variant>
 #include <optional>
+#include <filesystem>
 
 #include "unicode.h"
 
@@ -19,7 +20,7 @@ namespace tiny {
 
     //! Value is a variant that can hold any of a unicode string, an uint64, an int64, a long double or a boolean
     using Value = std::variant<
-            tiny::UnicodeString, // ID, string or char
+            tiny::String, // ID, string or char
             std::int64_t,            // Integer
             std::uint64_t,           // Unsigned integer
             long double,             // Decimal
@@ -362,23 +363,25 @@ namespace tiny {
 
     //! An Import holds information on an individual import call such as the name of the module and its optional alias.
     struct Import {
+        explicit Import() = default;
+
         /*!
          * \brief Creates a standard (non-aliased) import with the name of the module
          * \param modl Name of the module
          */
-        explicit Import(tiny::UnicodeString modl) : mod(std::move(modl)) {};
+        explicit Import(tiny::String modl) :mod(std::move(modl)) {};
 
         /*!
          * \brief Creates an aliased import over the name of the module
          * \param modl Name of the module
          * \param als Alias of the imported module
          */
-        explicit Import(tiny::UnicodeString modl, tiny::UnicodeString als) : mod(std::move(modl)), alias(std::move(als)) {};
+        explicit Import(tiny::String modl, tiny::String als) :mod(std::move(modl)), alias(std::move(als)) {};
 
         //! Name of the module getting imported
-        tiny::UnicodeString mod;
+        tiny::String mod;
         //! Optional alias for the import
-        tiny::UnicodeString alias;
+        tiny::String alias;
 
         /*!
          * \brief Serializes the Import as a JSON object
@@ -405,18 +408,18 @@ namespace tiny {
          * \param stmts Vector of the AST roots
          */
         explicit ASTFile(std::string_view fn,
-                         tiny::UnicodeString modl,
+                         tiny::String modl,
                          std::vector<tiny::Import> imprts,
                          tiny::StatementList stmts) :
                 filename(fn),
-                mod(modl),
+                mod(std::move(modl)),
                 imports(std::move(imprts)),
                 stmts(std::move(stmts)) {};
 
         //! Path to the original file that created the AST
         std::string filename;
         //! Name of the module which the file is a part of
-        tiny::UnicodeString mod;
+        tiny::String mod;
         //! Imports called by the code in the file
         std::vector<tiny::Import> imports;
         //! The AST
@@ -429,12 +432,11 @@ namespace tiny {
         [[nodiscard]] nlohmann::json toJson() const;
 
         /*!
-         * TODO
-         * \brief Deserializes a JSON object into a file
-         * \return An ASTFile with the reconstructed data
-         *
-         * [[nodiscard]] tiny::ASTFile fromJson(nlohmann::json) const;
+         * \brief Creates a JSON dump of the AST
+         * \param path Where to create the file
+         * \return A nlohmann::json with the data of the Parameter
          */
+        void dumpJson(const std::filesystem::path &path) const;
     };
 }
 

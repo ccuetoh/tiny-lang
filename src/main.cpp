@@ -3,13 +3,23 @@
 
 #include "logger.h"
 #include "compiler.h"
+#include "config.h"
 
 /*
  * Important: This is the WIP main, and it's here just for testing.
  */
 
-int main(int argc, char **argv) {
-    tiny::Logger::get().setLevel(tiny::LogLv::Debug);
+int main(int argc, char *argv[]) {
+    try {
+        tiny::Configuration::get().parseArguments(argc, argv);
+    } catch(const tiny::CLIError &e) {
+        tiny::fatal(e.msg);
+        return 1;
+    }
+
+    // Set the logging level
+    auto lv = tiny::LogLevel(std::get<std::int32_t>(tiny::getSetting(tiny::Option::Log).param));
+    tiny::Logger::get().setLevel(lv);
 
     try {
         std::locale::global(std::locale("en_US.UTF8"));
@@ -18,7 +28,7 @@ int main(int argc, char **argv) {
         tiny::warn("Non-ASCII characters might be unrecognized.");
     }
 
-    if (argc == 2 && (strcmp(argv[1], "--version") == 0 || strcmp(argv[1], "version") == 0)) {
+    if (tiny::getSetting(tiny::Option::PrintVersion).isEnabled) {
         std::cout << TINY_NAME << " " << TINY_VERSION << " (" << TINY_VERSION_NICKNAME << "). "
                   << TINY_COPYRIGHT << " " << TINY_LICENCE << std::endl;
         return 0;

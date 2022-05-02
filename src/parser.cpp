@@ -67,7 +67,7 @@ tiny::ASTFile tiny::Parser::file(std::string_view filename, bool requireModule) 
 /*
  *  ModuleStatement ::= module STRING
  */
-tiny::UnicodeString tiny::Parser::moduleStatement(bool optional) {
+tiny::String tiny::Parser::moduleStatement(bool optional) {
     exhaust(SKIPABLE_TOKENS);
 
     if (!consumeOptional(tiny::Token::KwModule)) {
@@ -93,7 +93,7 @@ std::vector<tiny::Import> tiny::Parser::importStatement() {
         return imports; // No imports
     }
 
-    consume(tiny::Token::OBraces);
+    consume(tiny::Token::OParenthesis);
     while (true) {
         exhaust(SKIPABLE_TOKENS);
 
@@ -108,7 +108,7 @@ std::vector<tiny::Import> tiny::Parser::importStatement() {
 
         if (!consumeOptional(tiny::Token::Comma)) {
             exhaust(SKIPABLE_TOKENS);
-            consume(tiny::Token::CBraces);
+            consume(tiny::Token::CParenthesis);
 
             return imports;
         }
@@ -1136,7 +1136,7 @@ tiny::ASTNode tiny::Parser::literalStr() {
     auto lexeme = consume(tiny::Token::LiteralStr);
 
     auto node = tiny::ASTNode(tiny::ASTNodeType::LiteralString);
-    node.val = tiny::UnicodeString(lexeme.value);
+    node.val = tiny::String(lexeme.value);
 
     return node;
 }
@@ -1149,7 +1149,7 @@ tiny::ASTNode tiny::Parser::literalChar() {
     auto lexeme = consume(tiny::Token::LiteralChar);
 
     auto node = tiny::ASTNode(tiny::ASTNodeType::LiteralChar);
-    node.val = tiny::UnicodeString(lexeme.value);
+    node.val = tiny::String(lexeme.value);
 
     return node;
 }
