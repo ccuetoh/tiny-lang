@@ -93,15 +93,15 @@ std::int32_t tiny::LogMsg::levelColour(tiny::LogLevel lv) {
         case LogLevel::Fatal:
             return 12;
 #else
-            case LogLevel::Debug:
-                return 37;
-            case LogLevel::Info:
-                return 34;
-            case LogLevel::Warning:
-                return 33;
-            case LogLevel::Error:
-            case LogLevel::Fatal:
-                return 31;
+        case LogLevel::Debug:
+            return 37;
+        case LogLevel::Info:
+            return 34;
+        case LogLevel::Warning:
+            return 33;
+        case LogLevel::Error:
+        case LogLevel::Fatal:
+            return 31;
 #endif
         default:
             return 0;

@@ -21,6 +21,7 @@ namespace tiny{
     struct Setting {
         //! The option this state corresponds to
         tiny::Option option = Option::Invalid;
+
         //! Whether the setting is enabled or disabled. Behavior depends on which option this setting corresponds to
         bool isEnabled = false;
 

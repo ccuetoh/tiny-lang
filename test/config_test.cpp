@@ -1,42 +1,23 @@
 #include "gtest/gtest.h"
 
-#include "stream.h"
+#include "config.h"
 
-TEST(WalkableStream, StreamOperations) {
-    std::vector<std::int32_t> vec = {1, 2, 3, 4, 5};
-    auto ws = tiny::Stream(vec);
+TEST(Configuration, GetSetting) {
+    auto config = tiny::getSetting(tiny::Option::PrintVersion);
 
-    ASSERT_EQ(ws.get(), 1);
-    ASSERT_EQ(ws.peek(), 2);
-    ASSERT_EQ(ws.get(), 2);
-
-    ws.seek(0);
-    ASSERT_EQ(ws.get(), 1);
-
-    ws.backup();
-    ASSERT_EQ(ws.peek(), 1);
-
-    ws.skip();
-    ASSERT_EQ(ws.peek(), 2);
-
-    ws.advance(50);
-    ASSERT_EQ(ws.get(), 0);
-    ASSERT_EQ(ws.peek(), 0);
-
-    ws.backup();
-    ws.backup();
-    ASSERT_EQ(ws.peek(), 3);
+    // Default settings
+    ASSERT_EQ(config.option, tiny::Option::PrintVersion);
+    ASSERT_EQ(config.isEnabled, false);
+    ASSERT_EQ(std::get<tiny::String>(config.param), tiny::String(""));
 }
 
-TEST(WalkableStream, StreamLargeVector) {
-    std::vector<long> vec;
-    for (long i = 0; i < 9999999; i++) {
-        vec.push_back(i);
-    }
+TEST(Configuration, SetSetting) {
+    tiny::Setting stng{tiny::Option::Log, true, std::int32_t(tiny::LogLevel::Debug)};
+    tiny::Configuration::get().setSetting(stng);
 
-    auto ws = tiny::Stream(vec);
+    auto config = tiny::getSetting(tiny::Option::Log);
 
-    for (long i = 0; i < 9999999; i++) {
-        ASSERT_EQ(ws.get(), i);
-    }
+    ASSERT_EQ(config.option, tiny::Option::Log);
+    ASSERT_EQ(config.isEnabled, true);
+    ASSERT_EQ(std::get<std::int32_t>(config.param), std::int32_t(tiny::LogLevel::Debug));
 }
