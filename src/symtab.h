@@ -2,15 +2,33 @@
 #define TINY_SYMTAB_H
 
 #include <string>
+#include <utility>
 #include <vector>
+#include <deque>
+#include <optional>
+
+#include "metadata.h"
 
 namespace tiny {
+    enum class SymTabType {
+        Variable,
+        Struct,
+        Trait,
+        Module
+    };
+
     struct SymTabEntry {
         SymTabEntry() = default;
-        SymTabEntry(std::string_view id, std::string_view type): identifier(id), type(type) {};
+        SymTabEntry(const std::string_view &id,
+                const std::string_view &name,
+                tiny::Metadata meta,
+                tiny::SymTabType type=SymTabType::Variable):
+                    identifier(id), type_name(name), type(type), meta(std::move(meta)) {};
 
         std::string identifier;
-        std::string type;
+        std::string type_name;
+        tiny::SymTabType type = SymTabType::Variable;
+        tiny::Metadata meta;
 
         bool is_const = false;
         bool is_pointer = false;
@@ -19,17 +37,26 @@ namespace tiny {
             return identifier == rhs.identifier;
         };
 
-        bool operator==(const std::string &id) const {
+        bool operator==(const std::string_view &id) const {
             return identifier == id;
         };
     };
 
-    class Context {
+    class Scope {
         std::vector<SymTabEntry> entries;
+
+    public:
+        [[nodiscard]] std::optional<SymTabEntry> lookup(const std::string_view &id) const;
+        void addEntry(const tiny::SymTabEntry &entry);
     };
 
     class SymbolTable {
-        
+        std::deque<Scope> scopes;
+
+    public:
+        [[nodiscard]] std::optional<SymTabEntry> lookup(const std::string_view &id) const;
+        void enterScope();
+        void exitScope();
     };
 }
 
