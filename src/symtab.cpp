@@ -1,7 +1,7 @@
 #include "symtab.h"
 #include "errors.h"
 
-std::optional<tiny::SymTabEntry> tiny::SymbolTable::lookup(const std::string_view& id) const
+std::optional<tiny::SymTabEntry> tiny::SymbolTable::lookup(const tiny::String& id) const
 {
     for (auto const &scope: scopes) {
         auto const &result = scope.lookup(id);
@@ -20,10 +20,19 @@ void tiny::SymbolTable::enterScope()
 
 void tiny::SymbolTable::exitScope()
 {
-    scopes.emplace_front();
+    if (!scopes.empty() && !scopes[0].is_global) {
+        scopes.erase(scopes.begin());
+    }
 }
 
-std::optional<tiny::SymTabEntry> tiny::Scope::lookup(const std::string_view& id) const
+void tiny::SymbolTable::addEntry(const tiny::SymTabEntry& entry)
+{
+    if (!scopes.empty()) {
+        scopes[0].addEntry(entry);
+    }
+}
+
+std::optional<tiny::SymTabEntry> tiny::Scope::lookup(const tiny::String& id) const
 {
     for (auto const& entry: entries) {
         if (entry == id) {
