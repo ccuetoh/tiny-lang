@@ -716,9 +716,14 @@ tiny::ASTNode tiny::Parser::assignmentExpression() {
 
     tiny::ASTNodeType op;
     switch (s.peek().token) {
-        case tiny::Token::Init:
+        case tiny::Token::Init: {
             op = tiny::ASTNodeType::Initialization;
+            if (lhs.type != tiny::ASTNodeType::TypedExpression && lhs.type != tiny::ASTNodeType::Identifier) {
+                throw tiny::ParseError("Can only initialize identifiers", s.get().metadata);
+            }
+
             break;
+        }
         case tiny::Token::Assign:
             op = tiny::ASTNodeType::Assignment;
             break;
