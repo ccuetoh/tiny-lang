@@ -14,7 +14,7 @@ namespace tiny {
      */
     struct CompilerError : public std::exception {
         //! Explanation of the error
-        const std::string &msg;
+        std::string msg;
         //! Information about the error, that might include the file and fragment that triggered it
         tiny::Metadata meta;
 
@@ -23,7 +23,7 @@ namespace tiny {
          * \param msg Explanation of the error
          * \param md Information about the error
          */
-        explicit CompilerError(const std::string &msg, tiny::Metadata md) : msg(msg), meta(std::move(md)) {};
+        explicit CompilerError(std::string msg, tiny::Metadata md) : msg(std::move(msg)), meta(std::move(md)) {};
 
         /*!
          * \brief Returns a C-string detailing the error
@@ -52,6 +52,11 @@ namespace tiny {
 
     //! Gets thrown by the semantic analyzer when a identifier gets redefined and is not a variable
     struct IlegalRedefinitionError : tiny::CompilerError {
+        using CompilerError::CompilerError; // Inherit the constructor
+    };
+
+    //! Gets thrown when a fetch over an AST node yielded no results, but one wes explicitly expected
+    struct NoSuchChild : tiny::CompilerError {
         using CompilerError::CompilerError; // Inherit the constructor
     };
 
