@@ -333,17 +333,49 @@ std::optional<std::shared_ptr<tiny::ASTNode>> tiny::ASTNode::getChild(tiny::ASTN
     return {};
 }
 
-void tiny::ASTNode::addChildren(const tiny::ASTNode &c) {
+std::shared_ptr<tiny::ASTNode> tiny::ASTNode::mustGetChild(tiny::ASTNodeType t) const
+{
+    for (const auto& c: children) {
+        if (c->type==t) {
+            return c;
+        }
+    }
+
+    throw tiny::NoSuchChild("Node of type '" + tiny::ASTNode(meta, t).toString() + "' expected but not found", meta);
+}
+
+void tiny::ASTNode::addChildren(const tiny::ASTNode& c)
+{
     children.push_back(std::make_shared<tiny::ASTNode>(c));
 }
 
-void tiny::ASTNode::addChildren(const tiny::StatementList &cs) {
-    for (auto &n: cs) {
+void tiny::ASTNode::addChildren(const tiny::StatementList& cs)
+{
+    for (auto& n: cs) {
         children.push_back(std::make_shared<tiny::ASTNode>(n));
     }
 }
 
-void tiny::ASTFile::dumpJson(const std::filesystem::path &path) const {
+std::shared_ptr<tiny::ASTNode> tiny::ASTNode::mustGetLHS() const
+{
+    if (children.empty()) {
+        throw tiny::NoSuchChild("Tried to get the left-most child, but the node has no children", meta);
+    }
+
+    return children[0];
+}
+
+std::shared_ptr<tiny::ASTNode> tiny::ASTNode::mustGetRHS() const
+{
+    if (children.size()<2) {
+        throw tiny::NoSuchChild("Tried to get the right-most child, but it doesn't exist", meta);
+    }
+
+    return children[1];
+}
+
+void tiny::ASTFile::dumpJson(const std::filesystem::path& path) const
+{
     std::ofstream jsonOut;
     jsonOut.open(path);
     jsonOut << toJson().dump(4);
