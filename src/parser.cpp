@@ -182,7 +182,8 @@ tiny::ASTNode tiny::Parser::errorHandledBlockStatement() {
 
         if (check(tiny::Token::OBraces)) {
             // Inlined block handle
-            auto node = tiny::ASTNode(tiny::ASTNodeType::ErrorHandle, lhs, blockStatement());
+            auto stmt = blockStatement();
+            auto node = tiny::ASTNode(getMetadata(), tiny::ASTNodeType::ErrorHandle, lhs, stmt);
 
             auto varNameParam = tiny::Parameter(tiny::ParameterType::ErrorVarName, id.value);
             node.addParam(varNameParam);
@@ -191,7 +192,7 @@ tiny::ASTNode tiny::Parser::errorHandledBlockStatement() {
         }
 
         // Callback handler
-        auto node = tiny::ASTNode(tiny::ASTNodeType::ErrorHandle, lhs);
+        auto node = tiny::ASTNode(getMetadata(), tiny::ASTNodeType::ErrorHandle, lhs);
 
         auto callbackName = tiny::Parameter(tiny::ParameterType::ErrorCallback, id.value);
         node.addParam(callbackName);
@@ -209,7 +210,7 @@ tiny::ASTNode tiny::Parser::blockStatement() {
     consume(tiny::Token::OBraces);
     exhaust(tiny::Token::NewLine);
 
-    tiny::ASTNode exp(tiny::ASTNodeType::BlockStatement);
+    tiny::ASTNode exp(getMetadata(), tiny::ASTNodeType::BlockStatement);
     exp.addChildren(statementList(tiny::Token::CBraces));
     exhaust(tiny::Token::NewLine);
 
@@ -224,22 +225,25 @@ tiny::ASTNode tiny::Parser::ifStatement() {
     consume(tiny::Token::KwIf);
     exhaust(tiny::Token::NewLine);
 
-    auto condition = tiny::ASTNode(tiny::ASTNodeType::BranchCondition, expression());
+    auto exp = expression();
+    auto condition = tiny::ASTNode(getMetadata(), tiny::ASTNodeType::BranchCondition, exp);
 
     exhaust(tiny::Token::NewLine);
-    auto consequent = tiny::ASTNode(tiny::ASTNodeType::BranchConsequent, blockStatement());
+    auto stmt = blockStatement();
+    auto consequent = tiny::ASTNode(getMetadata(), tiny::ASTNodeType::BranchConsequent, stmt);
     exhaust(tiny::Token::NewLine);
 
     if (!consumeOptional(tiny::Token::KwElse)) {
         // No else
-        return tiny::ASTNode(tiny::ASTNodeType::IfStatement, condition, consequent);
+        return tiny::ASTNode(getMetadata(), tiny::ASTNodeType::IfStatement, condition, consequent);
     }
 
     exhaust(tiny::Token::NewLine);
-    auto alternative = tiny::ASTNode(tiny::ASTNodeType::BranchAlternative, blockStatement());
+    stmt = blockStatement();
+    auto alternative = tiny::ASTNode(getMetadata(), tiny::ASTNodeType::BranchAlternative, stmt);
     exhaust(tiny::Token::NewLine);
 
-    return tiny::ASTNode(tiny::ASTNodeType::IfStatement, condition, consequent, alternative);
+    return tiny::ASTNode(getMetadata(), tiny::ASTNodeType::IfStatement, condition, consequent, alternative);
 }
 
 
@@ -259,7 +263,7 @@ tiny::ASTNode tiny::Parser::forStatement() {
     if (check(tiny::Token::OBraces)) {
         // Empty for (infinite loop). Equivalent to "for true {}"
 
-        conditionDownstream = tiny::ASTNode(tiny::ASTNodeType::LiteralBool);
+        conditionDownstream = tiny::ASTNode(getMetadata(), tiny::ASTNodeType::LiteralBool);
         conditionDownstream.val = true;
 
     } else {
@@ -279,20 +283,21 @@ tiny::ASTNode tiny::Parser::forStatement() {
     }
 
 
-    auto condition = tiny::ASTNode(tiny::ASTNodeType::BranchCondition, conditionDownstream);
+    auto condition = tiny::ASTNode(getMetadata(), tiny::ASTNodeType::BranchCondition, conditionDownstream);
 
     exhaust(tiny::Token::NewLine);
-    auto consequent = tiny::ASTNode(tiny::ASTNodeType::BranchConsequent, blockStatement());
+    auto stmt = blockStatement();
+    auto consequent = tiny::ASTNode(getMetadata(), tiny::ASTNodeType::BranchConsequent, stmt);
     exhaust(tiny::Token::NewLine);
 
-    return tiny::ASTNode(tiny::ASTNodeType::ForStatement, condition, consequent);
+    return tiny::ASTNode(getMetadata(), tiny::ASTNodeType::ForStatement, condition, consequent);
 }
 
 /*
  *  RangeExpression ::= <Identifier> := <AdditiveExpression>..(<AdditiveExpression>) (-> <AdditiveExpression>)
  */
 tiny::ASTNode tiny::Parser::rangeExpression() {
-    tiny::ASTNode node(tiny::ASTNodeType::RangeExpression);
+    tiny::ASTNode node(getMetadata(), tiny::ASTNodeType::RangeExpression);
 
     auto id = consume(tiny::Token::Id);
     node.addParam(tiny::Parameter(tiny::ParameterType::RangeIdentifier, id.value));
@@ -300,20 +305,23 @@ tiny::ASTNode tiny::Parser::rangeExpression() {
     consume(tiny::Token::Init);
 
     // Don't accept anything upstream from additive since it might involve non-numeric operands
-    node.addChildren(tiny::ASTNode(tiny::ASTNodeType::RangeFromExpression, additiveExpression())); // From
+    auto exp = additiveExpression();
+    node.addChildren(tiny::ASTNode(getMetadata(), tiny::ASTNodeType::RangeFromExpression, exp)); // From
     consume(tiny::Token::Range);
 
     exhaust(tiny::Token::NewLine);
     if (!check(tiny::Token::OBraces) && !check(tiny::Token::Step)) {
-        node.addChildren(tiny::ASTNode(tiny::ASTNodeType::RangeToExpression, additiveExpression())); // To
+        exp = additiveExpression();
+        node.addChildren(tiny::ASTNode(getMetadata(), tiny::ASTNodeType::RangeToExpression, exp)); // To
     } else {
-        node.addChildren(tiny::ASTNode(tiny::ASTNodeType::RangeToExpression)); // Placeholder to
+        node.addChildren(tiny::ASTNode(getMetadata(), tiny::ASTNodeType::RangeToExpression)); // Placeholder to
     }
 
     if (consumeOptional(tiny::Token::Step)) {
-        node.addChildren(tiny::ASTNode(tiny::ASTNodeType::RangeStepExpression, additiveExpression())); // StageStep
+        exp = additiveExpression();
+        node.addChildren(tiny::ASTNode(getMetadata(), tiny::ASTNodeType::RangeStepExpression, exp)); // StageStep
     } else {
-        node.addChildren(tiny::ASTNode(tiny::ASTNodeType::RangeStepExpression)); // Placeholder step
+        node.addChildren(tiny::ASTNode(getMetadata(), tiny::ASTNodeType::RangeStepExpression)); // Placeholder step
     }
 
     return node;
@@ -323,7 +331,7 @@ tiny::ASTNode tiny::Parser::rangeExpression() {
  *  ForEachExpression ::= <Identifier> in <AdditiveExpression>
  */
 tiny::ASTNode tiny::Parser::forEachExpression() {
-    tiny::ASTNode node(tiny::ASTNodeType::ForEachExpression);
+    tiny::ASTNode node(getMetadata(), tiny::ASTNodeType::ForEachExpression);
 
     auto id = consume(tiny::Token::Id);
     node.addParam(tiny::Parameter(tiny::ParameterType::RangeIdentifier, id.value));
@@ -342,7 +350,7 @@ tiny::ASTNode tiny::Parser::forEachExpression() {
 tiny::ASTNode tiny::Parser::funcDeclStatement(bool isPrototype) {
     consume(tiny::Token::KwFunc);
 
-    tiny::ASTNode node(tiny::ASTNodeType::FunctionDeclaration);
+    tiny::ASTNode node(getMetadata(), tiny::ASTNodeType::FunctionDeclaration);
 
     // Method?
     if (!isPrototype && consumeOptional(tiny::Token::OParenthesis)) {
@@ -365,7 +373,8 @@ tiny::ASTNode tiny::Parser::funcDeclStatement(bool isPrototype) {
     exhaust(tiny::Token::NewLine);
 
     if (!isPrototype) {
-        node.addChildren(tiny::ASTNode(ASTNodeType::FunctionBody, blockStatement()));
+        auto stmt = blockStatement();
+        node.addChildren(tiny::ASTNode(getMetadata(), ASTNodeType::FunctionBody, stmt));
     }
 
     return node;
@@ -375,7 +384,7 @@ tiny::ASTNode tiny::Parser::funcDeclStatement(bool isPrototype) {
  *  FunctionArgumentDeclList ::= ([<AddressableType> (ConstraintList)[, <AddressableType> (ConstraintList)]*|e])
  */
 tiny::ASTNode tiny::Parser::argumentDeclList(bool hasNamedArgs) {
-    tiny::ASTNode node(tiny::ASTNodeType::FunctionArgumentDeclList);
+    tiny::ASTNode node(getMetadata(), tiny::ASTNodeType::FunctionArgumentDeclList);
 
     consume(tiny::Token::OParenthesis);
 
@@ -407,7 +416,7 @@ tiny::ASTNode tiny::Parser::argumentDeclList(bool hasNamedArgs) {
 }
 
 tiny::ASTNode tiny::Parser::returnDeclList() {
-    tiny::ASTNode node(tiny::ASTNodeType::FunctionReturnDeclList);
+    tiny::ASTNode node(getMetadata(), tiny::ASTNodeType::FunctionReturnDeclList);
 
     bool isParenthesised = consumeOptional(tiny::Token::OParenthesis);
 
@@ -451,7 +460,7 @@ tiny::ASTNode tiny::Parser::returnStatement() {
  *  CommaSeparatedExpressionList ::= [<Expression>[, <Expression>]*|e] (TERMINATOR)
  */
 tiny::ASTNode tiny::Parser::commaSeparatedExpressionList(const std::vector<tiny::Token> &terminators) {
-    tiny::ASTNode node(tiny::ASTNodeType::ExpressionList);
+    tiny::ASTNode node(getMetadata(), tiny::ASTNodeType::ExpressionList);
 
     while (std::find(terminators.begin(), terminators.end(), s.peek().token) == terminators.end()) {
         node.addChildren(expression());
@@ -470,7 +479,7 @@ tiny::ASTNode tiny::Parser::commaSeparatedExpressionList(const std::vector<tiny:
 tiny::ASTNode tiny::Parser::structStatement() {
     consume(tiny::Token::KwStruct);
 
-    tiny::ASTNode node(tiny::ASTNodeType::StructDeclaration);
+    tiny::ASTNode node(getMetadata(), tiny::ASTNodeType::StructDeclaration);
     node.addParam(tiny::Parameter(tiny::ParameterType::Name, identifier().val));
 
     exhaust(tiny::Token::NewLine);
@@ -494,7 +503,7 @@ tiny::ASTNode tiny::Parser::structStatement() {
 tiny::ASTNode tiny::Parser::traitStatement() {
     consume(tiny::Token::KwTrait);
 
-    tiny::ASTNode node(tiny::ASTNodeType::TraitDeclaration);
+    tiny::ASTNode node(getMetadata(), tiny::ASTNodeType::TraitDeclaration);
     node.addParam(tiny::Parameter(tiny::ParameterType::Name, identifier().val));
 
     exhaust(tiny::Token::NewLine);
@@ -519,7 +528,7 @@ tiny::ASTNode tiny::Parser::traitStatement() {
 tiny::ASTNode tiny::Parser::traitListStatement() {
     consume(tiny::Token::OBrackets);
 
-    tiny::ASTNode node(tiny::ASTNodeType::TraitList);
+    tiny::ASTNode node(getMetadata(), tiny::ASTNodeType::TraitList);
 
     while (!check(tiny::Token::CBrackets)) {
         exhaust(tiny::Token::NewLine);
@@ -542,7 +551,7 @@ tiny::ASTNode tiny::Parser::traitListStatement() {
  *  StructFieldList ::= { <Identifier> [,  (/n*) <Identifier>]*|e) }
  */
 tiny::ASTNode tiny::Parser::structFieldList() {
-    tiny::ASTNode node(tiny::ASTNodeType::StructFieldList);
+    tiny::ASTNode node(getMetadata(), tiny::ASTNodeType::StructFieldList);
 
     consume(tiny::Token::OBraces);
     exhaust(tiny::Token::NewLine);
@@ -597,7 +606,7 @@ tiny::ASTNode tiny::Parser::structFieldList() {
  *  TraitFieldList ::= { <Identifier> [,  (/n*) <Identifier>]*|e) }
  */
 tiny::ASTNode tiny::Parser::traitFieldList() {
-    tiny::ASTNode node(tiny::ASTNodeType::TraitFieldList);
+    tiny::ASTNode node(getMetadata(), tiny::ASTNodeType::TraitFieldList);
 
     consume(tiny::Token::OBraces);
     exhaust(tiny::Token::NewLine);
@@ -642,7 +651,7 @@ tiny::ASTNode tiny::Parser::traitFieldList() {
  *  ExpressionStatement ::= <Expression>
  */
 tiny::ASTNode tiny::Parser::expressionStatement(std::vector<tiny::Token> terminators) {
-    tiny::ASTNode exp(tiny::ASTNodeType::ExpressionStatement);
+    tiny::ASTNode exp(getMetadata(), tiny::ASTNodeType::ExpressionStatement);
     exp.addChildren(expression());
 
     // We reached the EOF. This means there's a missing newline at the end.
@@ -677,7 +686,8 @@ tiny::ASTNode tiny::Parser::errorHandleExpression() {
 
         if (check(tiny::Token::OBraces)) {
             // Inlined block handle
-            auto node = tiny::ASTNode(tiny::ASTNodeType::ErrorHandle, lhs, blockStatement());
+            auto exp = blockStatement();
+            auto node = tiny::ASTNode(getMetadata(), tiny::ASTNodeType::ErrorHandle, lhs, exp);
 
             auto varNameParam = tiny::Parameter(tiny::ParameterType::ErrorVarName, id.value);
             node.addParam(varNameParam);
@@ -686,7 +696,7 @@ tiny::ASTNode tiny::Parser::errorHandleExpression() {
         }
 
         // Callback handler
-        auto node = tiny::ASTNode(tiny::ASTNodeType::ErrorHandle, lhs);
+        auto node = tiny::ASTNode(getMetadata(), tiny::ASTNodeType::ErrorHandle, lhs);
 
         auto callbackName = tiny::Parameter(tiny::ParameterType::ErrorCallback, id.value);
         node.addParam(callbackName);
@@ -743,7 +753,8 @@ tiny::ASTNode tiny::Parser::assignmentExpression() {
         throw tiny::ParseError("Invalid assignment. Can only assign a value to an identifier", s.get().metadata);
     }
 
-    return tiny::ASTNode(op, lhs, logicalExpression());
+    auto exp = logicalExpression();
+    return tiny::ASTNode(getMetadata(), op, lhs, exp);
 }
 
 /*
@@ -771,7 +782,8 @@ tiny::ASTNode tiny::Parser::logicalExpression() {
                 return lhs;
         }
 
-        lhs = tiny::ASTNode(op, lhs, equalityExpression());
+        auto exp = equalityExpression();
+        lhs = tiny::ASTNode(getMetadata(), op, lhs, exp);
     }
 }
 
@@ -810,7 +822,8 @@ tiny::ASTNode tiny::Parser::equalityExpression() {
                 return lhs;
         }
 
-        lhs = tiny::ASTNode(op, lhs, relationalExpression());
+        auto exp = relationalExpression();
+        lhs = tiny::ASTNode(getMetadata(), op, lhs, exp);
     }
 }
 
@@ -839,7 +852,8 @@ tiny::ASTNode tiny::Parser::relationalExpression() {
                 return lhs;
         }
 
-        lhs = tiny::ASTNode(op, lhs, additiveExpression());
+        auto exp = additiveExpression();
+        lhs = tiny::ASTNode(getMetadata(), op, lhs, exp);
     }
 }
 
@@ -868,7 +882,8 @@ tiny::ASTNode tiny::Parser::additiveExpression() {
                 return lhs;
         }
 
-        lhs = tiny::ASTNode(op, lhs, multiplicativeExpression());
+        auto exp = additiveExpression();
+        lhs = tiny::ASTNode(getMetadata(), op, lhs, exp);
     }
 }
 
@@ -897,7 +912,8 @@ tiny::ASTNode tiny::Parser::multiplicativeExpression() {
                 return lhs;
         }
 
-        lhs = tiny::ASTNode(op, lhs, exponentiatingExpression());
+        auto exp = exponentiatingExpression();
+        lhs = tiny::ASTNode(getMetadata(), op, lhs, exp);
     }
 }
 
@@ -909,7 +925,8 @@ tiny::ASTNode tiny::Parser::exponentiatingExpression() {
     auto lhs = unaryExpression();
 
     while (consumeOptional(tiny::Token::Exp)) {
-        lhs = tiny::ASTNode(tiny::ASTNodeType::OpExponentiate, lhs, unaryExpression());
+        auto exp = unaryExpression();
+        lhs = tiny::ASTNode(getMetadata(), tiny::ASTNodeType::OpExponentiate, lhs, exp);
     }
 
     return lhs;
@@ -924,11 +941,13 @@ tiny::ASTNode tiny::Parser::exponentiatingExpression() {
  */
 tiny::ASTNode tiny::Parser::unaryExpression() {
     if (consumeOptional(tiny::Token::Sub)) {
-        return tiny::ASTNode(tiny::ASTNodeType::UnaryNegative, unaryExpression());
+        auto exp = unaryExpression();
+        return tiny::ASTNode(getMetadata(), tiny::ASTNodeType::UnaryNegative, exp);
     }
 
     if (consumeOptional(tiny::Token::Negation)) {
-        return tiny::ASTNode(tiny::ASTNodeType::UnaryNot, unaryExpression());
+        auto exp = unaryExpression();
+        return tiny::ASTNode(getMetadata(), tiny::ASTNodeType::UnaryNot, exp);
     }
 
     if (consumeOptional(tiny::Token::ValueAt)) {
@@ -961,7 +980,7 @@ tiny::ASTNode tiny::Parser::callExpression() {
 
         consume(tiny::Token::CParenthesis);
 
-        lhs = tiny::ASTNode(tiny::ASTNodeType::FunctionCall, lhs, args);
+        lhs = tiny::ASTNode(getMetadata(), tiny::ASTNodeType::FunctionCall, lhs, args);
     }
 
     return lhs;
@@ -978,14 +997,16 @@ tiny::ASTNode tiny::Parser::memberExpression() {
     while (check(tiny::Token::MemberAccess) || check(tiny::Token::OBrackets)) {
         // <MemberExpression>.<Identifier>
         if (consumeOptional(tiny::Token::MemberAccess)) {
-            lhs = tiny::ASTNode(tiny::ASTNodeType::MemberAccess, lhs, identifier());
+            auto id = identifier();
+            lhs = tiny::ASTNode(getMetadata(), tiny::ASTNodeType::MemberAccess, lhs, id);
             lhs.addParam(tiny::Parameter(tiny::ParameterType::ComputedAccess, false));
         }
 
         // <MemberExpression>[<Expression>]
         if (consumeOptional(tiny::Token::OBrackets)) {
             // Don't use expression() since it'll allow for error-handled expressions
-            lhs = tiny::ASTNode(tiny::ASTNodeType::IndexedAccess, lhs, assignmentExpression());
+            auto exp = assignmentExpression();
+            lhs = tiny::ASTNode(getMetadata(), tiny::ASTNodeType::IndexedAccess, lhs, exp);
             lhs.addParam(tiny::Parameter(tiny::ParameterType::ComputedAccess, true));
 
             consumeOptional(tiny::Token::CBrackets);
@@ -1044,7 +1065,7 @@ tiny::ASTNode tiny::Parser::typedExpression() {
     // <AddressableType> <Identifier>
     auto checkpoint = s.getIndex();
     try {
-        tiny::ASTNode node(tiny::ASTNodeType::TypedExpression);
+        tiny::ASTNode node(getMetadata(), tiny::ASTNodeType::TypedExpression);
         node.addChildren(addressableType());
 
         node.val = consume(tiny::Token::Id).value;
@@ -1055,7 +1076,7 @@ tiny::ASTNode tiny::Parser::typedExpression() {
     }
 
     // (const) <AddressableIdentifier> <Identifier>
-    tiny::ASTNode node(tiny::ASTNodeType::TypedExpression);
+    tiny::ASTNode node(getMetadata(), tiny::ASTNodeType::TypedExpression);
 
     auto isConst = consumeOptional(tiny::Token::KwConst);
 
@@ -1116,14 +1137,14 @@ tiny::ASTNode tiny::Parser::literalNum() {
     auto lexeme = consume(tiny::Token::LiteralNum);
 
     if (lexeme.value.toString().find('.') != std::string::npos) { // Check if it's a decimal number
-        auto node = tiny::ASTNode(tiny::ASTNodeType::LiteralDecimal);
+        auto node = tiny::ASTNode(getMetadata(), tiny::ASTNodeType::LiteralDecimal);
         node.val = std::stold(lexeme.value.toString());
 
         return node;
     }
 
     // Default to an int64
-    auto node = tiny::ASTNode(tiny::ASTNodeType::LiteralInt);
+    auto node = tiny::ASTNode(getMetadata(), tiny::ASTNodeType::LiteralInt);
     node.val = std::int64_t(std::stoll(lexeme.value.toString(), nullptr, 0));
 
     return node;
@@ -1135,7 +1156,7 @@ tiny::ASTNode tiny::Parser::literalNum() {
 tiny::ASTNode tiny::Parser::literalStr() {
     auto lexeme = consume(tiny::Token::LiteralStr);
 
-    auto node = tiny::ASTNode(tiny::ASTNodeType::LiteralString);
+    auto node = tiny::ASTNode(getMetadata(), tiny::ASTNodeType::LiteralString);
     node.val = tiny::String(lexeme.value);
 
     return node;
@@ -1148,7 +1169,7 @@ tiny::ASTNode tiny::Parser::literalStr() {
 tiny::ASTNode tiny::Parser::literalChar() {
     auto lexeme = consume(tiny::Token::LiteralChar);
 
-    auto node = tiny::ASTNode(tiny::ASTNodeType::LiteralChar);
+    auto node = tiny::ASTNode(getMetadata(), tiny::ASTNodeType::LiteralChar);
     node.val = tiny::String(lexeme.value);
 
     return node;
@@ -1158,7 +1179,7 @@ tiny::ASTNode tiny::Parser::literalChar() {
  *  LiteralBool ::= True|False
  */
 tiny::ASTNode tiny::Parser::literalBool() {
-    auto node = tiny::ASTNode(tiny::ASTNodeType::LiteralBool);
+    auto node = tiny::ASTNode(getMetadata(), tiny::ASTNodeType::LiteralBool);
 
     auto got = s.get();
     switch (got.token) {
@@ -1178,7 +1199,7 @@ tiny::ASTNode tiny::Parser::literalBool() {
  */
 tiny::ASTNode tiny::Parser::literalNone() {
     auto lexeme = consume(tiny::Token::LiteralNone);
-    return tiny::ASTNode(tiny::ASTNodeType::LiteralNone);
+    return tiny::ASTNode(getMetadata(), tiny::ASTNodeType::LiteralNone);
 }
 
 /*
@@ -1206,14 +1227,14 @@ tiny::ASTNode tiny::Parser::addressableIdentifier() {
  *  Identifier ::= STRING
  */
 tiny::ASTNode tiny::Parser::identifier() {
-    return tiny::ASTNode(tiny::ASTNodeType::Identifier, consume(tiny::Token::Id).value);
+    return tiny::ASTNode(getMetadata(), tiny::ASTNodeType::Identifier, consume(tiny::Token::Id).value);
 }
 
 /*
  *  AddressableType ::= (const) [*|&|e][<Identifier>|BUILTIN_TYPE]
  */
 tiny::ASTNode tiny::Parser::addressableType() {
-    tiny::ASTNode node(tiny::ASTNodeType::Type);
+    tiny::ASTNode node(getMetadata(), tiny::ASTNodeType::Type);
 
     if (consumeOptional(tiny::Token::KwConst)) {
         node.addParam(tiny::Parameter(tiny::ParameterType::Const));

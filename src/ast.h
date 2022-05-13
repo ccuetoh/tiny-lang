@@ -6,10 +6,12 @@
 #include <variant>
 #include <optional>
 #include <filesystem>
+#include <deque>
 
 #include "unicode.h"
 
 #include "nlohmann/json.hpp"
+#include "metadata.h"
 
 namespace tiny {
     // Forward declaration
@@ -267,16 +269,17 @@ namespace tiny {
 
         /*!
          * \brief Constructs an empty node with the given type
+         * \param meta Metadata
          * \param t Type of the node
          */
-        explicit ASTNode(tiny::ASTNodeType t) : type(t) {};
+        explicit ASTNode(tiny::Metadata meta, tiny::ASTNodeType t) :type(t), meta(std::move(meta)) {};
 
         /*!
          * \brief Constructs a node withe the given type and one child
          * \param t Type of the node
          * \param c1 Child
          */
-        explicit ASTNode(tiny::ASTNodeType t, const tiny::ASTNode &c1);
+        explicit ASTNode(tiny::Metadata meta, tiny::ASTNodeType t, const tiny::ASTNode &c1);
 
         /*!
          * \brief Constructs a node withe the given type and two children
@@ -284,7 +287,7 @@ namespace tiny {
          * \param c1 Child 1
          * \param c2 Child 2
          */
-        explicit ASTNode(tiny::ASTNodeType t, const tiny::ASTNode &c1, const tiny::ASTNode &c2);
+        explicit ASTNode(tiny::Metadata meta, tiny::ASTNodeType t, const tiny::ASTNode &c1, const tiny::ASTNode &c2);
 
         /*!
          * \brief Constructs a node withe the given type and three children
@@ -293,22 +296,26 @@ namespace tiny {
          * \param c2 Child 2
          * \param c3 Child 3
          */
-        explicit ASTNode(tiny::ASTNodeType t, const tiny::ASTNode &c1, const tiny::ASTNode &c2,
-                         const tiny::ASTNode &c3);
+        explicit ASTNode(tiny::Metadata meta, tiny::ASTNodeType t, const tiny::ASTNode &c1,
+                const tiny::ASTNode &c2, const tiny::ASTNode &c3);
 
         /*!
          * \brief Constructs a node withe the given type and value
          * \param t Type of the node
          * \param v Value of the node
          */
-        explicit ASTNode(tiny::ASTNodeType t, tiny::Value v) : type(t), val(std::move(v)) {};
+        explicit ASTNode(tiny::Metadata meta, tiny::ASTNodeType t, tiny::Value v): type(t),
+                                                                                   meta(std::move(meta)),
+                                                                                   val(std::move(v)) {};
 
         //! The type of the node. Defaults to None
         tiny::ASTNodeType type = ASTNodeType::None;
         //! A vector of Parameters for this node
         std::vector<tiny::Parameter> params;
         //! A vector of the children of this node
-        std::vector<std::shared_ptr<tiny::ASTNode>> children; // TODO Perhaps use just the object to avoid memory fragmentation?
+        std::deque<std::shared_ptr<tiny::ASTNode>> children; // TODO Perhaps use just the object to avoid memory fragmentation?
+        //! Metadata relating to this node
+        tiny::Metadata meta;
         //! The optional value held by this node
         tiny::Value val;
 
@@ -340,13 +347,42 @@ namespace tiny {
         void addParam(const tiny::Parameter &p);
 
         /*!
-         * \brief Fetches a children node by type
+         * \brief Fetches a child node by type
          * \param t Type of the ASTNode to search for
-         * \return A std::optional with the ASTNode if found and empty otherwise
+         * \return A std::optional with the ASTNode shared pointer if found and empty otherwise
          *
-         * Fetches a children node by type. If more than one node of a given type is present, the behaviour is undefined
+         * Fetches a child node by type. If more than one node of a given type is present, the behaviour is undefined
          */
-        std::optional<std::shared_ptr<tiny::ASTNode>> getChildren(tiny::ASTNodeType t);
+        [[nodiscard]] std::optional<std::shared_ptr<tiny::ASTNode>> getChild(tiny::ASTNodeType t) const;
+
+        /*!
+         * \brief Fetches a child node by type and throws if no such children exists
+         * \param meta Metadata of the current context
+         * \param t Type of the ASTNode to search for
+         * \return An ASTNode shared pointer
+         *
+         * Fetches a child node by type. If more than one node of a given type is present, the behaviour is undefined.
+         * Throws if no such child exists.
+         */
+        [[nodiscard]] std::shared_ptr<tiny::ASTNode> mustGetChild(tiny::ASTNodeType t) const;
+
+        /*!
+         * \brief Fetches the first-most node, and throws if it doesn't exist
+         * \param meta Metadata of the current context
+         * \return An ASTNode shared pointer
+         *
+         * Fetches the first-most child. Throws if no such child exists.
+         */
+        [[nodiscard]] std::shared_ptr<tiny::ASTNode> mustGetLHS() const;
+
+        /*!
+         * \brief Fetches the second-most node, and throws if it doesn't exist
+         * \param meta Metadata of the current context
+         * \return An ASTNode shared pointer
+         *
+         * Fetches the second-most child. Throws if no such child exists.
+         */
+        [[nodiscard]] std::shared_ptr<tiny::ASTNode> mustGetRHS() const;
 
         /*!
          * \brief Adds a children node
@@ -414,7 +450,7 @@ namespace tiny {
                 filename(fn),
                 mod(std::move(modl)),
                 imports(std::move(imprts)),
-                stmts(std::move(stmts)) {};
+                statements(std::move(stmts)) {};
 
         //! Path to the original file that created the AST
         std::string filename;
@@ -423,7 +459,7 @@ namespace tiny {
         //! Imports called by the code in the file
         std::vector<tiny::Import> imports;
         //! The AST
-        tiny::StatementList stmts;
+        tiny::StatementList statements;
 
         /*!
          * \brief Serializes the file into a JSON object
