@@ -4,7 +4,6 @@
 #include <utility>
 
 #include "metadata.h"
-#include "logger.h"
 
 namespace tiny {
     /*!
@@ -55,9 +54,20 @@ namespace tiny {
         using CompilerError::CompilerError; // Inherit the constructor
     };
 
-    //! Gets thrown when a fetch over an AST node yielded no results, but one wes explicitly expected
-    struct NoSuchChild : tiny::CompilerError {
+    //! Base error for failed fetch operations over an AST. Narrower errors should be preferred over this generic one
+    struct BadASTError : tiny::CompilerError {
         using CompilerError::CompilerError; // Inherit the constructor
+    };
+
+
+    //! Gets thrown when a fetch over an AST node yielded no results, but one was explicitly expected
+    struct NoSuchChild : tiny::BadASTError {
+        using BadASTError::BadASTError; // Inherit the constructor
+    };
+
+    //! Gets thrown when a fetch over the string value of an AST node yielded no results, but one was explicitly expected
+    struct NoSuchValue : tiny::BadASTError {
+        using BadASTError::BadASTError; // Inherit the constructor
     };
 
     //! Gets thrown when a script in the pipeline reports an error
