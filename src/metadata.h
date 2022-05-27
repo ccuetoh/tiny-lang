@@ -3,6 +3,7 @@
 
 #include "stream.h"
 #include "unicode.h"
+#include "file.h"
 
 namespace tiny {
     //! The Metadata struct contains information regarding the character's stream information
@@ -12,16 +13,16 @@ namespace tiny {
 
         /*!
          * \brief Constructor with the start and end positions
-         * \param fn The file's path
+         * \param fn The file
          * \param startPos The index at which the metadata points
          * \param endPos The index at which the metadata stops
          */
-        explicit Metadata(std::string_view fn, std::uint64_t startPos, std::uint64_t endPos) : filename(fn),
-                                                                                               start(startPos),
-                                                                                               end(endPos) {};
+        explicit Metadata(const tiny::File &f, std::uint64_t startPos, std::uint64_t endPos) :file(f),
+                                                                                       start(startPos),
+                                                                                       end(endPos) {};
 
-        //! Filename from which the character proceeds from
-        std::string filename;
+        //! File from which the character proceeds from
+        tiny::File file;
 
         //! Index of the token start
         std::uint64_t start = 0;

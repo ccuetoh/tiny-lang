@@ -3,10 +3,11 @@
 #include <fstream>
 
 #include "file.h"
+#include "errors.h"
 
-const auto fileSelectorSandboxPath = std::filesystem::current_path() / "sandbox" / "file_selector";
-const auto fileSelectorInnerPath = fileSelectorSandboxPath / "inner";
-const auto fileSelectorInner2Path = fileSelectorSandboxPath / "inner2";
+static const auto fileSelectorSandboxPath = std::filesystem::current_path() / "sandbox" / "file_selector";
+static const auto fileSelectorInnerPath = fileSelectorSandboxPath / "inner";
+static const auto fileSelectorInner2Path = fileSelectorSandboxPath / "inner2";
 
 
 TEST(FileSelector, SandboxSetup) {

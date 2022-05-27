@@ -53,12 +53,12 @@ bool tiny::Parser::check(tiny::Token token) {
  *     -> Imports
  *     -> ModuleName
  */
-tiny::ASTFile tiny::Parser::file(std::string_view filename, bool requireModule) {
+tiny::ASTFile tiny::Parser::file(tiny::File file, bool requireModule) {
     auto mod = moduleStatement(!requireModule);
     auto imprts = importStatement();
 
     return tiny::ASTFile(
-            filename,
+            file,
             mod,
             imprts,
             statementList());

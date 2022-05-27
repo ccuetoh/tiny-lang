@@ -11,6 +11,7 @@
 #include "stream.h"
 #include "comparator.h"
 #include "metadata.h"
+#include "file.h"
 
 namespace tiny {
     //! A Token is an identifier of the semantic context-less meaning of the code fragment.
@@ -433,9 +434,9 @@ namespace tiny {
 
         /*!
          * \brief Sets the filename to be included in the metadata of the generated Lexemes
-         * \param filename The file's path
+         * \param f The file's path
          */
-        void setMetadataFilename(std::string_view filename);
+        void setMetadataFile(tiny::File f);
 
     private:
         //! The stream terminator used by the Lexer
@@ -479,8 +480,8 @@ namespace tiny {
          */
         Lexeme lexCharLiteral();
 
-        //! Filename to be used in the metadata
-        std::string filename;
+        //! File that originated the lexemes
+        tiny::File file;
 
         //! Current token's metadata
         [[nodiscard]] tiny::Metadata getMetadata() const;

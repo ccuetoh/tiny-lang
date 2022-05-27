@@ -1,5 +1,7 @@
 #include "logger.h"
 
+#include <filesystem>
+
 void tiny::Logger::setLevel(tiny::LogLevel lv) {
     level = lv;
 }
@@ -45,6 +47,11 @@ void tiny::Logger::log(const tiny::LogMsg &msg) {
 
 void tiny::Logger::debug(const std::string &msg) {
     log(LogLevel::Debug, msg);
+}
+
+void tiny::Logger::debug(const tiny::File &f, const std::string &msg) {
+    std::string msgWithPath("[" + f.getRelativePath().string() + "] " + msg);
+    log(LogLevel::Debug, msgWithPath);
 }
 
 void tiny::Logger::info(const std::string &msg) {

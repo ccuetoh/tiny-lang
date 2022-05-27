@@ -5,7 +5,6 @@
 #include <utility>
 
 #include "explorer.h"
-#include "errors.h"
 
 namespace tiny {
     //! Represents whether the file is a metadata file or a source-code file
@@ -18,8 +17,12 @@ namespace tiny {
 
     //! Represents a file (but doesn't actually holds it), and contains its path and type
     struct File {
+    public:
         tiny::FileType type = tiny::FileType::Source;
         std::filesystem::path path;
+
+        //! Gets the path relative to the current working directory
+        std::filesystem::path getRelativePath() const;
     };
 
     //! A FileSelector finds the metadata and source files to be used for the compiler

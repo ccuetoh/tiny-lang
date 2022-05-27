@@ -4,6 +4,7 @@
 #include "logger.h"
 #include "compiler.h"
 #include "config.h"
+#include "errors.h"
 
 /*
  * Important: This is the WIP main, and it's here just for testing.

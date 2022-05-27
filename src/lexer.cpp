@@ -1,4 +1,6 @@
 #include "lexer.h"
+
+#include <utility>
 #include "errors.h"
 
 std::vector<tiny::Lexeme> tiny::Lexer::lexAll()
@@ -237,14 +239,14 @@ tiny::Lexeme tiny::Lexer::lexCharLiteral()
     return Lexeme(tiny::Token::LiteralChar, tiny::String(next), meta);
 }
 
-void tiny::Lexer::setMetadataFilename(std::string_view fn)
+void tiny::Lexer::setMetadataFile(tiny::File f)
 {
-    filename = fn;
+    file = std::move(f);
 }
 
 tiny::Metadata tiny::Lexer::getMetadata() const
 {
-    return tiny::Metadata(filename, s.getIndex(), s.getIndex()+1);
+    return tiny::Metadata(file, s.getIndex(), s.getIndex()+1);
 }
 
 std::string tiny::Lexeme::string() const

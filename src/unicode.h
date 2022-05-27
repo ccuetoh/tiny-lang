@@ -67,10 +67,38 @@ namespace tiny {
         }
 
         /*!
+        * \brief Adds a char to the string
+        */
+        tiny::String operator + (const char cStr[]) const {
+            std::vector<std::uint32_t> codepointsCopy(codepoints);
+            for(char const* it = cStr; *it; ++it) {
+                codepointsCopy.push_back(*it);
+            }
+
+            tiny::String newString;
+            newString.codepoints = codepointsCopy;
+
+            return newString;
+        }
+
+        /*!
         * \brief Appends a string
         */
         void operator += (const tiny::String &str) {
             codepoints.insert(codepoints.end(), str.codepoints.begin(), str.codepoints.end());
+        }
+
+        /*!
+        * \brief Appends a string
+        */
+        tiny::String operator + (const tiny::String &str) const {
+            std::vector<std::uint32_t> codepointsCopy(codepoints);
+            codepointsCopy.insert(codepointsCopy.end(), str.codepoints.begin(), str.codepoints.end());
+
+            tiny::String newString;
+            newString.codepoints = codepointsCopy;
+
+            return newString;
         }
 
         /*!

@@ -1,5 +1,7 @@
 #include "compiler.h"
 #include "config.h"
+#include "symtab.h"
+#include "errors.h"
 
 std::string tiny::Compiler::getSignature() {
     return TINY_NAME + " " + TINY_VERSION + " (" + TINY_VERSION_NICKNAME + ")";
@@ -9,7 +11,7 @@ tiny::CompilationResult tiny::Compiler::compile() const {
     // Run the compilation steps in sequence, and then apply the pipeline to the stage
 
     tiny::debug(getSignature());
-    tiny::debug("File selection stage");
+    tiny::debug("Selecting files..");
 
     tiny::File meta;
 
@@ -38,13 +40,15 @@ tiny::CompilationResult tiny::Compiler::compile() const {
     std::vector<tiny::File> files(sources.begin(), sources.end());
     files.push_back(meta);
 
+    /*
     tiny::debug("Running file selection pipe with length " +
                             std::to_string(pl.getPipeLength(tiny::CompilationStep::FileSelection)));
     files = pl.runFileSelectionPipe(files);
+     */
 
-    tiny::debug("Selected " + std::to_string(files.size()) + " files: ");
+    tiny::debug("Got " + std::to_string(files.size()) + " files: ");
     for (auto const &f: files) {
-        tiny::debug("\t" + f.path.string());
+        tiny::debug("  " + f.path.string());
     }
 
     // With the sources selected we run each one of them in the compiler
@@ -55,16 +59,16 @@ tiny::CompilationResult tiny::Compiler::compile() const {
             continue;
         }
 
-        tiny::info("Compiling " + f.path.filename().string());
+        tiny::debug(f, "Running compiler..");
 
         std::ifstream filestream(f.path);
         tiny::Stream charStream(filestream);
 
         tiny::Lexer lexer(charStream);
-        lexer.setMetadataFilename(f.path.filename().string());
+        lexer.setMetadataFile(f);
         std::vector<tiny::Lexeme> lexemes;
 
-        tiny::debug("Lexing..");
+        tiny::debug(f, "Lexing..");
 
         /*
          * Lexing stage
@@ -82,13 +86,15 @@ tiny::CompilationResult tiny::Compiler::compile() const {
             return {tiny::CompilationStatus::Error, {tiny::CompilationStep::Lexer, e.what()}};
         }
 
+        /*
         tiny::debug("Running lex pipe with length " + std::to_string(pl.getPipeLength(tiny::CompilationStep::Lexer)));
         lexemes = pl.runLexPipe(lexemes);
+         */
 
         tiny::Stream<tiny::Lexeme> lexemeStream(lexemes);
         tiny::Parser parser(lexemeStream);
 
-        tiny::debug("Parsing..");
+        tiny::debug(f, "Parsing..");
 
         /*
          * Parse stage
@@ -98,7 +104,7 @@ tiny::CompilationResult tiny::Compiler::compile() const {
 
         tiny::ASTFile astFile;
         try {
-            astFile = parser.file(f.path.filename().string());
+            astFile = parser.file(f);
         } catch (const tiny::ParseError &e) {
             tiny::error(e.what());
             e.log(charStream);

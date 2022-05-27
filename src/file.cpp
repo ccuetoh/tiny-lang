@@ -36,3 +36,8 @@ std::vector<tiny::File> tiny::FileSelector::getFiles() const {
 
     return files;
 }
+
+std::filesystem::path tiny::File::getRelativePath() const
+{
+    return std::filesystem::relative(path, std::filesystem::current_path());
+}

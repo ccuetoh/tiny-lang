@@ -32,7 +32,7 @@ namespace tiny {
          * \param requireModule Whether an exception is thrown if no module name is declared
          * \return An ASTFile containing the Abstract Syntax Tree and data about the program
          */
-        [[nodiscard]] tiny::ASTFile file(std::string_view filename = "", bool requireModule = true);
+        [[nodiscard]] tiny::ASTFile file(tiny::File, bool requireModule = true);
 
     private:
         /*!

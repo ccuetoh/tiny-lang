@@ -6,10 +6,10 @@
 #include <mutex>
 
 #if defined(_WIN32)
-
 #include <Windows.h>
-
 #endif
+
+#include "file.h"
 
 namespace tiny {
     // Forward declaration
@@ -78,6 +78,12 @@ namespace tiny {
         * \param msg Message to log
         */
         void debug(const std::string &msg);
+
+        /*!
+        * \brief Logs a message at the Debug level with it's filename
+        * \param msg Message to log
+        */
+        void debug(const tiny::File &f, const std::string &msg);
 
         /*!
         * \brief Logs a message at the Info level
@@ -151,6 +157,7 @@ namespace tiny {
 
 #if !defined(TINY_DISABLE_COMPACT_LOGGING)
     inline auto debug(const std::string& msg) { tiny::Logger::get().debug(msg); }
+    inline auto debug(const tiny::File &f, const std::string& msg) { tiny::Logger::get().debug(f, msg); }
     inline auto info(const std::string& msg) { tiny::Logger::get().info(msg); }
     inline auto warn(const std::string& msg) { tiny::Logger::get().warning(msg); }
     inline auto error(const std::string& msg) { tiny::Logger::get().error(msg); }

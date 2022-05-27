@@ -12,6 +12,7 @@
 
 #include "nlohmann/json.hpp"
 #include "metadata.h"
+#include "file.h"
 
 namespace tiny {
     // Forward declaration
@@ -265,6 +266,7 @@ namespace tiny {
      * operation that the node represents
      */
     struct ASTNode {
+    public:
         ASTNode() = default;
 
         /*!
@@ -313,7 +315,7 @@ namespace tiny {
         //! A vector of Parameters for this node
         std::vector<tiny::Parameter> params;
         //! A vector of the children of this node
-        std::deque<std::shared_ptr<tiny::ASTNode>> children; // TODO Perhaps use just the object to avoid memory fragmentation?
+        std::vector<std::shared_ptr<tiny::ASTNode>> children; // TODO Perhaps use just the object to avoid memory fragmentation?
         //! Metadata relating to this node
         tiny::Metadata meta;
         //! The optional value held by this node
@@ -347,15 +349,6 @@ namespace tiny {
         void addParam(const tiny::Parameter &p);
 
         /*!
-         * \brief Fetches a child node by type
-         * \param t Type of the ASTNode to search for
-         * \return A std::optional with the ASTNode shared pointer if found and empty otherwise
-         *
-         * Fetches a child node by type. If more than one node of a given type is present, the behaviour is undefined
-         */
-        [[nodiscard]] std::optional<std::shared_ptr<tiny::ASTNode>> getChild(tiny::ASTNodeType t) const;
-
-        /*!
          * \brief Fetches a child node by type and throws if no such children exists
          * \param meta Metadata of the current context
          * \param t Type of the ASTNode to search for
@@ -364,7 +357,7 @@ namespace tiny {
          * Fetches a child node by type. If more than one node of a given type is present, the behaviour is undefined.
          * Throws if no such child exists.
          */
-        [[nodiscard]] std::shared_ptr<tiny::ASTNode> mustGetChild(tiny::ASTNodeType t) const;
+        [[nodiscard]] std::shared_ptr<tiny::ASTNode> getChild(tiny::ASTNodeType t) const;
 
         /*!
          * \brief Fetches the first-most node, and throws if it doesn't exist
@@ -373,7 +366,7 @@ namespace tiny {
          *
          * Fetches the first-most child. Throws if no such child exists.
          */
-        [[nodiscard]] std::shared_ptr<tiny::ASTNode> mustGetLHS() const;
+        [[nodiscard]] std::shared_ptr<tiny::ASTNode> getLHS() const;
 
         /*!
          * \brief Fetches the second-most node, and throws if it doesn't exist
@@ -382,7 +375,7 @@ namespace tiny {
          *
          * Fetches the second-most child. Throws if no such child exists.
          */
-        [[nodiscard]] std::shared_ptr<tiny::ASTNode> mustGetRHS() const;
+        [[nodiscard]] std::shared_ptr<tiny::ASTNode> getRHS() const;
 
         /*!
          * \brief Adds a children node
@@ -395,6 +388,14 @@ namespace tiny {
          * \param cs ASTNodes to add
          */
         void addChildren(const tiny::StatementList &cs);
+
+        /*!
+         * \brief Fetches the tiny::String from the value
+         * \return The string held by the node
+         *
+         * Fetches the tiny::String from the value. Throws if no such child exists. Fails if the value doesn't contain a string
+         */
+        [[nodiscard]] tiny::String getStringValue() const;
     };
 
     //! An Import holds information on an individual import call such as the name of the module and its optional alias.
@@ -443,17 +444,17 @@ namespace tiny {
          * \param imprts Vector lisitng the imported modules
          * \param stmts Vector of the AST roots
          */
-        explicit ASTFile(std::string_view fn,
+        explicit ASTFile(tiny::File fn,
                          tiny::String modl,
                          std::vector<tiny::Import> imprts,
                          tiny::StatementList stmts) :
-                filename(fn),
+                file(fn),
                 mod(std::move(modl)),
                 imports(std::move(imprts)),
                 statements(std::move(stmts)) {};
 
-        //! Path to the original file that created the AST
-        std::string filename;
+        //! File that generated this AST
+        tiny::File file;
         //! Name of the module which the file is a part of
         tiny::String mod;
         //! Imports called by the code in the file

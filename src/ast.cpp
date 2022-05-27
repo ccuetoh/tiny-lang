@@ -1,4 +1,5 @@
 #include <fstream>
+
 #include "ast.h"
 #include "errors.h"
 
@@ -38,7 +39,7 @@ nlohmann::json tiny::ASTFile::toJson() const
 
     return nlohmann::json{
             {"file", {
-                    {"path", filename},
+                    {"path", file.path.string()},
                     {"module", mod.toString()},
                     {"imports", jsonImports},
                     {"statements", jsonStmts}
@@ -322,18 +323,7 @@ void tiny::ASTNode::addParam(const tiny::Parameter& p)
     params.push_back(p);
 }
 
-std::optional<std::shared_ptr<tiny::ASTNode>> tiny::ASTNode::getChild(tiny::ASTNodeType t) const
-{
-    for (const auto& c: children) {
-        if (c->type==t) {
-            return c;
-        }
-    }
-
-    return {};
-}
-
-std::shared_ptr<tiny::ASTNode> tiny::ASTNode::mustGetChild(tiny::ASTNodeType t) const
+std::shared_ptr<tiny::ASTNode> tiny::ASTNode::getChild(tiny::ASTNodeType t) const
 {
     for (const auto& c: children) {
         if (c->type==t) {
@@ -356,7 +346,7 @@ void tiny::ASTNode::addChildren(const tiny::StatementList& cs)
     }
 }
 
-std::shared_ptr<tiny::ASTNode> tiny::ASTNode::mustGetLHS() const
+std::shared_ptr<tiny::ASTNode> tiny::ASTNode::getLHS() const
 {
     if (children.empty()) {
         throw tiny::NoSuchChild("Tried to get the left-most child, but the node has no children", meta);
@@ -365,7 +355,7 @@ std::shared_ptr<tiny::ASTNode> tiny::ASTNode::mustGetLHS() const
     return children[0];
 }
 
-std::shared_ptr<tiny::ASTNode> tiny::ASTNode::mustGetRHS() const
+std::shared_ptr<tiny::ASTNode> tiny::ASTNode::getRHS() const
 {
     if (children.size()<2) {
         throw tiny::NoSuchChild("Tried to get the right-most child, but it doesn't exist", meta);
@@ -380,4 +370,12 @@ void tiny::ASTFile::dumpJson(const std::filesystem::path& path) const
     jsonOut.open(path);
     jsonOut << toJson().dump(4);
     jsonOut.close();
+}
+
+tiny::String tiny::ASTNode::getStringValue() const {
+    if (!std::holds_alternative<tiny::String>(val)) {
+        throw tiny::NoSuchValue("Tried to get the string value of a node that didn't contain one", meta);
+    }
+
+    return std::get<tiny::String>(val);
 }
