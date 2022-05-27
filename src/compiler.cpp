@@ -120,14 +120,21 @@ tiny::CompilationResult tiny::Compiler::compile() const {
             return {tiny::CompilationStatus::Error, {tiny::CompilationStep::Parser, e.what()}};
         }
 
+        /*
         tiny::debug("Running parse pipe with length " + std::to_string(pl.getPipeLength(tiny::CompilationStep::Parser)));
         astFile = pl.runParsePipe(astFile);
+         */
 
         if (tiny::getSetting(tiny::Option::OutputASTJSON).isEnabled) {
             astFile.dumpJson(f.path.filename().string() + ".ast.json");
         }
 
         astFiles.push_back(astFile);
+
+        tiny::debug(f, "Building symbol table..");
+
+        tiny::SymbolTable symtab(astFile);
+        symtab.build();
     }
 
     tiny::info("Done");

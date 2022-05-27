@@ -1,54 +1,89 @@
 #include "symtab.h"
-#include "errors.h"
+#include "logger.h"
 
-std::optional<tiny::SymTabEntry> tiny::SymbolTable::lookup(const tiny::String& id) const
+void tiny::SymbolTable::build()
 {
-    for (auto const &scope: scopes) {
-        auto const &result = scope.lookup(id);
-        if (result.has_value()) {
-            return result;
+    for (const auto &node: ast.statements) {
+        update(std::make_shared<ASTNode>(node));
+    }
+}
+
+void tiny::SymbolTable::update(const std::shared_ptr<ASTNode> &node)
+{
+    switch (node->type) {
+    case tiny::ASTNodeType::BlockStatement:
+        getActive().inner.emplace_back();
+        break;
+
+    case tiny::ASTNodeType::OpAddition:
+    case tiny::ASTNodeType::OpSubtraction:
+    case tiny::ASTNodeType::OpMultiplication:
+    case tiny::ASTNodeType::OpDivision:
+    case tiny::ASTNodeType::OpExponentiate:
+        getActive().parseOperation(node);
+        return;
+    }
+
+    for (const auto &c: node->children) {
+        update(c);
+    }
+}
+
+tiny::Scope& tiny::SymbolTable::getActive()
+{
+    tiny::Scope& focus = root;
+    while (!focus.inner.empty()) {
+        focus = focus.inner.front();
+    }
+
+    return focus;
+}
+
+void tiny::Scope::parseOperation(const std::shared_ptr<ASTNode> &node)
+{
+    for (const auto &c: node->children) {
+        if (c->type == tiny::ASTNodeType::Identifier) {
+            addPromise(tiny::Promise(
+                    c->getStringValue(),
+                    tiny::Assertion::Exists,
+                    c->meta));
+            continue;
         }
-    }
 
-    return {};
-}
-
-void tiny::SymbolTable::enterScope()
-{
-    scopes.emplace_front();
-}
-
-void tiny::SymbolTable::exitScope()
-{
-    if (!scopes.empty() && !scopes[0].is_global) {
-        scopes.erase(scopes.begin());
+        // TODO Member access
     }
 }
 
-void tiny::SymbolTable::addEntry(const tiny::SymTabEntry& entry)
-{
-    if (!scopes.empty()) {
-        scopes[0].addEntry(entry);
-    }
+void tiny::Scope::addPromise(tiny::Promise promise) {
+    tiny::debug(promise.meta.file, "Promise -> " + promise.toString().toString());
+
+    promises.push_back(std::move(promise));
 }
 
-std::optional<tiny::SymTabEntry> tiny::Scope::lookup(const tiny::String& id) const
-{
-    for (auto const& entry: entries) {
-        if (entry == id) {
-            return entry;
-        }
-    }
+void tiny::Scope::addFulfilment(tiny::Promise fulfilment) {
+    tiny::debug(fulfilment.meta.file, "Fulfilment -> " + fulfilment.toString().toString());
 
-    return {};
+    fulfillments.push_back(std::move(fulfilment));
 }
 
-void tiny::Scope::addEntry(const tiny::SymTabEntry &entry)
+tiny::String tiny::Promise::toString() const
 {
-    if (auto const& exists = lookup(entry.identifier);
-    exists.has_value() && exists.value().type == tiny::SymTabType::Module) {
-        throw tiny::IlegalRedefinitionError("Module names can't be reused", entry.meta); // TODO Clearer message?
+    switch (assertion) {
+    case Assertion::Exists:
+        return identifier + " exists";
+    case Assertion::HasMember:
+        return identifier + " has member " + argument;
+    case Assertion::IsIndexable:
+        return identifier + " is indexable";
+    case Assertion::IsStruct:
+        return identifier + " is a struct";
+    case Assertion::IsCallable:
+        return identifier + " is callable";
+    case Assertion::IsNumeric:
+        return identifier + " is of a numeric type";
+    case Assertion::IsOfType:
+        return identifier + " is of type " + argument;
+    default:
+        return "Invalid promise";
     }
-
-    entries.push_back(entry);
 }
