@@ -583,7 +583,7 @@ tiny::ASTNode tiny::Parser::structFieldList() {
         auto field = typedExpression();
         field.type = tiny::ASTNodeType::StructField;
 
-        if (field.getParam(tiny::ParameterType::Const).has_value()) {
+        if (field.hasParam(tiny::ParameterType::Const)) {
             s.backup();
             throw tiny::ParseError("Constant types are not allowed inside structs", s.get().metadata);
         }
@@ -628,7 +628,7 @@ tiny::ASTNode tiny::Parser::traitFieldList() {
         }
 
         auto field = typedExpression();
-        if (field.getParam(tiny::ParameterType::Const).has_value()) {
+        if (field.hasParam(tiny::ParameterType::Const)) {
             s.backup();
             throw tiny::ParseError("Constant types are not allowed inside traits", s.get().metadata);
         }

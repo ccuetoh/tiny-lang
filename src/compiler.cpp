@@ -9,6 +9,7 @@ std::string tiny::Compiler::getSignature() {
 
 tiny::CompilationResult tiny::Compiler::compile() const {
     // Run the compilation steps in sequence, and then apply the pipeline to the stage
+    std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
     tiny::debug(getSignature());
     tiny::debug("Selecting files..");
@@ -137,7 +138,9 @@ tiny::CompilationResult tiny::Compiler::compile() const {
         symtab.build();
     }
 
-    tiny::info("Done");
+    std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+    std::string runtime(std::to_string(std::chrono::duration_cast<std::chrono::seconds>(end - begin).count()));
+    tiny::info("Done (" + runtime + "s)");
 
     return {tiny::CompilationStatus::Ok};
 }

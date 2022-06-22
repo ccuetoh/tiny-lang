@@ -49,16 +49,30 @@ namespace tiny {
         using CompilerError::CompilerError; // Inherit the constructor
     };
 
-    //! Gets thrown by the semantic analyzer when a identifier gets redefined and is not a variable
-    struct IlegalRedefinitionError : tiny::CompilerError {
+    //! Gets thrown by the semantic analyzer when the code is syntactically valid, yet makes no semantic sense
+    struct SemanticError : tiny::CompilerError {
         using CompilerError::CompilerError; // Inherit the constructor
+    };
+
+    //! Gets thrown by the semantic analyzer when an operation is done between operators of incompatible types
+    struct IncompatibleTypesError : tiny::SemanticError {
+        using SemanticError::SemanticError; // Inherit the constructor
+    };
+
+    //! Gets thrown by the semantic analyzer when an operation requires a type type to be defined, but is yet unknown
+    struct UnknownTypeError : tiny::SemanticError {
+        using SemanticError::SemanticError; // Inherit the constructor
+    };
+
+    //! Gets thrown by the semantic analyzer when an operation requires a type type to be defined, but is yet unknown
+    struct InvalidTypeError : tiny::SemanticError {
+        using SemanticError::SemanticError; // Inherit the constructor
     };
 
     //! Base error for failed fetch operations over an AST. Narrower errors should be preferred over this generic one
     struct BadASTError : tiny::CompilerError {
         using CompilerError::CompilerError; // Inherit the constructor
     };
-
 
     //! Gets thrown when a fetch over an AST node yielded no results, but one was explicitly expected
     struct NoSuchChild : tiny::BadASTError {
@@ -69,6 +83,12 @@ namespace tiny {
     struct NoSuchValue : tiny::BadASTError {
         using BadASTError::BadASTError; // Inherit the constructor
     };
+
+    //! Gets thrown when a fetch over a parameter inside a AST node yielded no results, but one was explicitly expected
+    struct NoSuchParameter : tiny::BadASTError {
+        using BadASTError::BadASTError; // Inherit the constructor
+    };
+
 
     //! Gets thrown when a script in the pipeline reports an error
     struct PipelineError : public std::exception {

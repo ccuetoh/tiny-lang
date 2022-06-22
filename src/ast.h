@@ -101,6 +101,13 @@ namespace tiny {
          * \return A nlohmann::json with the data of the Parameter
          */
         [[nodiscard]] nlohmann::json toJson() const;
+
+        /*!
+         * \brief Gets the value as a tiny::String. Throws NoSuchValue if val doesn't contain a string
+         * \param meta The metadata of the base node searching the parameter. Required for error reporting
+         * \return A tiny::String
+         */
+        [[nodiscard]] tiny::String getStringVal(const tiny::Metadata& meta) const;
     };
 
     //! The type of a given ASTNode
@@ -117,8 +124,6 @@ namespace tiny {
 
         //! Literal integer value
         LiteralInt,
-        //! Literal unsigned integer value
-        LiteralUInt,
         //! Literal decimal value
         LiteralDecimal,
         //! Literal boolean value
@@ -336,11 +341,19 @@ namespace tiny {
         /*!
          * \brief Fetches a Parameter by type
          * \param t Type of the Parameter to search for
-         * \return A std::optional with the Parameter if found and empty otherwise
+         * \return The Parameter, if found
          *
-         * Fetches a Parameter by type. If more than one Parameter of a given type is present, the behaviour is undefined
+         * Fetches a Parameter by type. If more than one Parameter of a given type is present, the behaviour is undefined.
+         * Throws NoSuchParameter if the parameter doesn't exist.
          */
-        [[nodiscard]] std::optional<tiny::Parameter> getParam(tiny::ParameterType t) const;
+        [[nodiscard]] tiny::Parameter getParam(tiny::ParameterType t) const;
+
+        /*!
+         * \brief Returns whether the node contains a parameter of matching type
+         * \param t Type of the Parameter to search for
+         * \return True if it contains a parameter of type t, false otherwise
+         */
+        [[nodiscard]] bool hasParam(ParameterType t) const;
 
         /*!
          * \brief Adds a parameter to the node
@@ -366,7 +379,7 @@ namespace tiny {
          *
          * Fetches the first-most child. Throws if no such child exists.
          */
-        [[nodiscard]] std::shared_ptr<tiny::ASTNode> getLHS() const;
+        [[nodiscard]] std::shared_ptr<tiny::ASTNode> getFirstChild() const;
 
         /*!
          * \brief Fetches the second-most node, and throws if it doesn't exist
@@ -375,7 +388,7 @@ namespace tiny {
          *
          * Fetches the second-most child. Throws if no such child exists.
          */
-        [[nodiscard]] std::shared_ptr<tiny::ASTNode> getRHS() const;
+        [[nodiscard]] std::shared_ptr<tiny::ASTNode> getSecondChild() const;
 
         /*!
          * \brief Adds a children node
@@ -395,7 +408,13 @@ namespace tiny {
          *
          * Fetches the tiny::String from the value. Throws if no such child exists. Fails if the value doesn't contain a string
          */
-        [[nodiscard]] tiny::String getStringValue() const;
+        [[nodiscard]] tiny::String getStringVal() const;
+
+        /*!
+         * \brief Returns whether the node's type is an operation
+         * \return True if the node's type is an operation, false otherwise
+         */
+        [[nodiscard]] bool isOperation() const;
     };
 
     //! An Import holds information on an individual import call such as the name of the module and its optional alias.

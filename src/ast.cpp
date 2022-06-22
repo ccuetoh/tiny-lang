@@ -87,8 +87,6 @@ std::string tiny::ASTNode::toString() const
 
     case tiny::ASTNodeType::LiteralInt:
         return "LiteralInt";
-    case tiny::ASTNodeType::LiteralUInt:
-        return "LiteralUInt";
     case tiny::ASTNodeType::LiteralDecimal:
         return "LiteralDecimal";
     case tiny::ASTNodeType::LiteralBool:
@@ -282,6 +280,15 @@ std::string tiny::Parameter::toString() const
     }
 }
 
+tiny::String tiny::Parameter::getStringVal(const Metadata& meta) const
+{
+    if (!std::holds_alternative<tiny::String>(val)) {
+        throw tiny::NoSuchValue("Tried to get the string value of a node that didn't contain one", meta);
+    }
+
+    return std::get<tiny::String>(val);
+}
+
 std::string tiny::toString(tiny::Value val)
 {
     if (std::holds_alternative<tiny::String>(val)) {
@@ -307,7 +314,7 @@ std::string tiny::toString(tiny::Value val)
     return ""; // Empty val
 }
 
-std::optional<tiny::Parameter> tiny::ASTNode::getParam(tiny::ParameterType t) const
+tiny::Parameter tiny::ASTNode::getParam(tiny::ParameterType t) const
 {
     for (const auto& p: params) {
         if (p.type==t) {
@@ -315,7 +322,12 @@ std::optional<tiny::Parameter> tiny::ASTNode::getParam(tiny::ParameterType t) co
         }
     }
 
-    return {};
+    throw tiny::NoSuchParameter("Parameter of type '" + tiny::Parameter(t).toString() + "' expected but not found", meta);
+}
+
+bool tiny::ASTNode::hasParam(tiny::ParameterType t) const
+{
+    return std::any_of(params.begin(), params.end(), [&t](auto p){return p.type == t;});
 }
 
 void tiny::ASTNode::addParam(const tiny::Parameter& p)
@@ -346,7 +358,7 @@ void tiny::ASTNode::addChildren(const tiny::StatementList& cs)
     }
 }
 
-std::shared_ptr<tiny::ASTNode> tiny::ASTNode::getLHS() const
+std::shared_ptr<tiny::ASTNode> tiny::ASTNode::getFirstChild() const
 {
     if (children.empty()) {
         throw tiny::NoSuchChild("Tried to get the left-most child, but the node has no children", meta);
@@ -355,7 +367,7 @@ std::shared_ptr<tiny::ASTNode> tiny::ASTNode::getLHS() const
     return children[0];
 }
 
-std::shared_ptr<tiny::ASTNode> tiny::ASTNode::getRHS() const
+std::shared_ptr<tiny::ASTNode> tiny::ASTNode::getSecondChild() const
 {
     if (children.size()<2) {
         throw tiny::NoSuchChild("Tried to get the right-most child, but it doesn't exist", meta);
@@ -372,10 +384,15 @@ void tiny::ASTFile::dumpJson(const std::filesystem::path& path) const
     jsonOut.close();
 }
 
-tiny::String tiny::ASTNode::getStringValue() const {
+tiny::String tiny::ASTNode::getStringVal() const {
     if (!std::holds_alternative<tiny::String>(val)) {
         throw tiny::NoSuchValue("Tried to get the string value of a node that didn't contain one", meta);
     }
 
     return std::get<tiny::String>(val);
+}
+
+bool tiny::ASTNode::isOperation() const
+{
+    return type >= tiny::ASTNodeType::OpAddition && type <= tiny::ASTNodeType::OpExponentiate;
 }

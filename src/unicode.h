@@ -89,7 +89,7 @@ namespace tiny {
         }
 
         /*!
-        * \brief Appends a string
+        * \brief Appends a tiny::String
         */
         tiny::String operator + (const tiny::String &str) const {
             std::vector<std::uint32_t> codepointsCopy(codepoints);
@@ -99,6 +99,17 @@ namespace tiny {
             newString.codepoints = codepointsCopy;
 
             return newString;
+        }
+
+        /*!
+        * \brief Appends a std::string
+        */
+        tiny::String operator + (const std::string &str) const {
+            tiny::String newString;
+            std::vector<std::uint32_t> codepointsCopy(codepoints);
+            newString.codepoints = codepointsCopy;
+
+            return newString + tiny::String(str);
         }
 
         /*!
